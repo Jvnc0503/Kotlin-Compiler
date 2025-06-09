@@ -1,0 +1,14 @@
+cmake-build-debug
+.idea
+lfw_funneled
+.conda
+__pycache__
+*.csv
+*.tsv
+*.tar
+*.log
+*.gz
+*.zip
+*.tar.gz
+*.rar
+*.7z
