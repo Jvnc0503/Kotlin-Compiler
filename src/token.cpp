@@ -8,7 +8,7 @@ Token::Token(const Type type) : type(type) {
 Token::Token(const Type type, const char c) : type(type), text(std::string(1, c)) {
 }
 
-Token::Token(const Type type, const std::string &source, const size_t first, const size_t length) : type(type),
+Token::Token(const Type type, const std::string &source, const size_t& first, const size_t& length) : type(type),
     text(source.substr(first, length)) {
 }
 

@@ -48,7 +48,7 @@ struct Token {
 
     Token(Type type, char c);
 
-    Token(Type type, const std::string &source, size_t first, size_t last);
+    Token(Type type, const std::string &source, const size_t& first, const size_t& length);
 
     static std::string typeToString(const Type &type);
 
