@@ -1,6 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
-
+#include <string>
+#include <ostream>
 
 struct Token {
     enum Type {
@@ -39,6 +40,21 @@ struct Token {
         // Extra
         ENDOFFILE, ERROR
     };
+
+    Type type;
+    std::string text;
+
+    explicit Token(Type type);
+
+    Token(Type type, char c);
+
+    Token(Type type, const std::string &source, size_t first, size_t last);
+
+    static std::string typeToString(const Type &type);
+
+    friend std::ostream &operator<<(std::ostream &os, const Token &t);
+
+    friend std::ostream &operator<<(std::ostream &os, const Token *t);
 };
 
 
