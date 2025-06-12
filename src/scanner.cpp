@@ -51,7 +51,7 @@ Token *Scanner::nextToken() {
             precededBySemicolon = false;
             return nextToken();
         }
-        return new Token(Token::ENDL, line, column);
+        return new Token(Token::ENDL, "\\n", 0, 2, line, column);
     }
 
     first = current;
@@ -175,7 +175,7 @@ Token *Scanner::nextToken() {
 
     current++;
     column++;
-    return new Token(type, tokenLine, tokenColumn);
+    return new Token(type, c, tokenLine, tokenColumn);
 }
 
 void Scanner::test() {

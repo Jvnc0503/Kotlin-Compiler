@@ -39,7 +39,7 @@ std::string Token::typeToString(const Type &type) {
 
 std::ostream &operator<<(std::ostream &os, const Token &t) {
     os << "TOKEN(" << Token::typeToString(t.type) << ", " << t.text << ")";
-    os << " at line " << t.line << ", column " << t.column << '\n';
+    os << "\tline " << t.line << ", column " << t.column << '\n';
     return os;
 }
 
