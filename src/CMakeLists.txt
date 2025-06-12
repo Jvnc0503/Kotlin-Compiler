@@ -7,4 +7,6 @@ add_executable(src main.cpp
         token.h
         token.cpp
         scanner.h
-        scanner.cpp)
+        scanner.cpp
+        exp.cpp
+        exp.h)
