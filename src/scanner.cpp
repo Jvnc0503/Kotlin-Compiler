@@ -2,6 +2,7 @@
 #include "token.h"
 #include <utility>
 #include <unordered_map>
+#include <iostream>
 
 Scanner::Scanner(std::string input): input(std::move(input)), first(0), current(0) {
 }
@@ -177,3 +178,18 @@ Token *Scanner::nextToken() {
     return new Token(type, tokenLine, tokenColumn);
 }
 
+void Scanner::test() {
+    Token *current;
+    std::cout << "Testing Scanner:\n\n";
+    while ((current = nextToken())->type != Token::ENDOFFILE) {
+        if (current->type == Token::ERROR) {
+            std::cout << "Scanner error, invalid character:\n" << current;
+            delete current;
+            return;
+        }
+        std::cout << current;
+        delete current;
+    }
+    std::cout << current;
+    delete current;
+}

@@ -8,5 +8,5 @@ add_executable(src main.cpp
         token.cpp
         scanner.h
         scanner.cpp
-        exp.cpp
-        exp.h)
+        ast.cpp
+        ast.h)
