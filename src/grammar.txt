@@ -1,0 +1,72 @@
+Program         ::= { Declaration [END] { ENDL } }
+
+Declaration     ::= VarDecl
+                 | FunDecl
+                 | ClassDecl
+
+VarDecl         ::= ("var" | "val") Identifier ( ":" Type )? "=" Expression END
+
+FunDecl         ::= "fun" Identifier "(" [ ParamList ] ")" ( ":" Type )? Block
+
+ClassDecl       ::= "class" Identifier "{" { Declaration [END] { ENDL } } "}"
+
+ParamList       ::= Parameter { "," Parameter }
+Parameter       ::= Identifier ":" Type
+
+Type            ::= "Int" | "Boolean" | "Unit"
+
+Block           ::= "{" { Statement [END] { ENDL } } "}"
+
+Statement       ::= VarDecl
+                 | ExpressionStatement
+                 | IfStatement
+                 | WhileStatement
+                 | ForStatement
+                 | ReturnStatement
+                 | Block
+
+ExpressionStatement ::= Expression END
+
+IfStatement     ::= "if" "(" Expression ")" Statement [ "else" Statement ]
+
+WhileStatement  ::= "while" "(" Expression ")" Statement
+
+ForStatement    ::= "for" "(" Identifier "in" Expression ".." Expression ")" Statement
+
+ReturnStatement ::= "return" [ Expression ] END
+
+Expression      ::= Assignment
+
+Assignment      ::= Identifier "=" Assignment
+                 | LogicOr
+
+LogicOr         ::= LogicAnd { "||" LogicAnd }
+
+LogicAnd        ::= Equality { "&&" Equality }
+
+Equality        ::= Comparison { ( "==" | "!=" ) Comparison }
+
+Comparison      ::= Term { ( "<" | "<=" | ">" | ">=" ) Term }
+
+Term            ::= Factor { ( "+" | "-" ) Factor }
+
+Factor          ::= Unary { ( "*" | "/" ) Unary }
+
+Unary           ::= ( "!" | "-" ) Unary
+                 | Primary
+
+Primary         ::= IntegerLiteral
+                 | BooleanLiteral
+                 | "this"
+                 | Identifier
+                 | "(" Expression ")"
+                 | Primary "." Identifier                  // member access
+                 | Identifier "(" [ ArgumentList ] ")"     // function call
+
+ArgumentList    ::= Expression { "," Expression }
+
+END             ::= SEMICOLON | ENDL
+
+Identifier      ::= ID
+IntegerLiteral  ::= INT_LITERAL
+BooleanLiteral  ::= "true" | "false"
