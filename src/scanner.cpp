@@ -41,6 +41,7 @@ Token *Scanner::nextToken() {
 
     const char c = input[current];
 
+    // Handle newline after semicolon
     if (c == '\n') {
         current++;
         line++;
@@ -55,6 +56,7 @@ Token *Scanner::nextToken() {
     first = current;
     const int tokenLine = line, tokenColumn = column;
 
+    // Number literals
     if (isdigit(c)) {
         current++;
         column++;
@@ -66,6 +68,7 @@ Token *Scanner::nextToken() {
         return new Token(Token::INT_LITERAL, input, first, current - first, tokenLine, tokenColumn);
     }
 
+    // Identifier or keyword
     if (isalpha(c)) {
         current++;
         column++;
@@ -79,8 +82,9 @@ Token *Scanner::nextToken() {
         return new Token(type, word, 0, word.length(), tokenLine, tokenColumn);
     }
 
+    // Two character tokens
     if (current + 1 < input.length()) {
-        std::string two = input.substr(current, 2);
+        const std::string two = input.substr(current, 2);
         if (two == "==") {
             current += 2;
             column += 2;
@@ -125,6 +129,7 @@ Token *Scanner::nextToken() {
         }
     }
 
+    // Single character tokens
     Token::Type type;
     switch (c) {
         case '+': type = Token::PLUS;
