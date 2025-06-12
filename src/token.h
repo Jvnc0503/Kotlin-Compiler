@@ -43,12 +43,16 @@ struct Token {
 
     Type type;
     std::string text;
+    int line;
+    int column;
 
-    explicit Token(Type type);
+    Token(Type type, int line, int column);
 
-    Token(Type type, char c);
+    Token(Type type, char c, int line, int column);
 
-    Token(Type type, const std::string &source, const size_t& first, const size_t& length);
+    Token(Type type, const std::string &source, const int &first, const int &length, int line, int column);
+
+    ~Token() = default;
 
     static std::string typeToString(const Type &type);
 
@@ -56,6 +60,5 @@ struct Token {
 
     friend std::ostream &operator<<(std::ostream &os, const Token *t);
 };
-
 
 #endif //TOKEN_H
