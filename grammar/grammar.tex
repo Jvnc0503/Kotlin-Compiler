@@ -1,0 +1,122 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\allowdisplaybreaks       % <— permite romper displays (align, alignat, etc.) entre páginas
+\usepackage{amssymb}
+\usepackage[top=1cm,bottom=2cm,left=2cm,right=2cm]{geometry}
+\begin{document}
+
+\section*{Gramática}
+
+\begin{alignat*}{2}
+% Program
+\textbf{Program}
+  \;&::=\; \{\;\text{Declaration}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+% Declaration
+\textbf{Declaration}
+  \;&::=\; \text{VarDecl}
+   \;|\;\text{FunDecl}
+   \;|\;\text{ClassDecl} \\[4pt]
+% VarDecl
+\textbf{VarDecl}
+  \;&::=\; (\;\text{"var"}\;\mid\;\text{"val"}\;)\;\text{Identifier}
+     \;(\;:\;\text{Type}\;)?
+     \;=\;\text{Expression}\;\text{END} \\[4pt]
+% FunDecl
+\textbf{FunDecl}
+  \;&::=\; \text{"fun"}\;\text{Identifier}
+     \;(\;[\;\text{ParamList}\;]\;)
+     \;(\;:\;\text{Type}\;)?
+     \;\text{Block} \\[4pt]
+% ClassDecl
+\textbf{ClassDecl}
+  \;&::=\; \text{"class"}\;\text{Identifier}
+     \;\{\;\text{Declaration}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+% ParamList
+\textbf{ParamList}
+  \;&::=\; \text{Parameter}
+   \;|\;\text{Parameter}\;,\;\text{ParamList} \\[4pt]
+% Parameter
+\textbf{Parameter}
+  \;&::=\; \text{Identifier}\;:\;\text{Type} \\[4pt]
+% Type
+\textbf{Type}
+  \;&::=\; \text{"Int"}
+   \;|\;\text{"Boolean"}
+   \;|\;\text{"Unit"} \\[4pt]
+% Block
+\textbf{Block}
+  \;&::=\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+% Statement
+\textbf{Statement}
+  \;&::=\; (\;\text{"var"}\;\mid\;\text{"val"}\;)\;\text{Identifier}
+     \;(\;:\;\text{Type}\;)?
+     \;=\;\text{Expression}\;\text{END} \\
+  \;&\mid\; \text{Expression}\;\text{END} \\
+  \;&\mid\; \text{"if"}\;( \text{Expression} )\;\text{Statement}
+     \;[\;\text{"else"}\;\text{Statement}\;] \\[4pt]
+  \;&\mid\; \text{"while"}\;( \text{Expression} )\;\text{Statement} \\[4pt]
+  \;&\mid\; \text{"for"}\;( \text{Identifier}\;\text{"in"}\;\text{Expression}
+     \;\text{".."}\;\text{Expression} )\;\text{Statement} \\[4pt]
+  \;&\mid\; \text{"return"}\;[\;\text{Expression}\;]\;\text{END} \\[4pt]
+  \;&\mid\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+% Expression
+\textbf{Expression}
+  \;&::=\; \text{Assignment} \\[4pt]
+% Assignment
+\textbf{Assignment}
+  \;&::=\; \text{Identifier}\;=\;\text{Assignment}
+   \;|\;\text{LogicOr} \\[4pt]
+% LogicOr
+\textbf{LogicOr}
+  \;&::=\; \text{LogicAnd}
+   \;|\;\text{LogicAnd}\;\text{"||"}\;\text{LogicAnd} \\[4pt]
+% LogicAnd
+\textbf{LogicAnd}
+  \;&::=\; \text{Equality}
+   \;|\;\text{Equality}\;\text{"&&"}\;\text{Equality} \\[4pt]
+% Equality
+\textbf{Equality}
+  \;&::=\; \text{Comparison}
+   \;|\;\text{Comparison}\;(\text{"=="}\;\mid\;\text{"!="})\;\text{Comparison} \\[4pt]
+% Comparison
+\textbf{Comparison}
+  \;&::=\; \text{Term}
+   \;|\;\text{Term}\;(\text{"<"}\;\mid\;\text{"<="}\;\mid\;\text{">"}\;\mid\;\text{">="})\;\text{Term} \\[4pt]
+% Term
+\textbf{Term}
+  \;&::=\; \text{Factor}
+   \;|\;\text{Factor}\;(\text{"+"}\;\mid\;\text{"-"})\;\text{Factor} \\[4pt]
+% Factor
+\textbf{Factor}
+  \;&::=\; \text{Unary}
+   \;|\;\text{Unary}\;(\text{"*"}\;\mid\;\text{/"})\;\text{Unary} \\[4pt]
+% Unary
+\textbf{Unary}
+  \;&::=\; (\;\text{"!"}\;\mid\;\text{"-"}\;)\;\text{Unary}
+   \;|\;\text{Primary} \\[4pt]
+% Primary
+\textbf{Primary}
+  \;&::=\; \text{IntegerLiteral}\;( \text{INT\_LITERAL} ) \\[2pt]
+  \;&\mid\; \text{BooleanLiteral}\;( \text{"true"}\;\mid\;\text{"false"} ) \\[2pt]
+  \;&\mid\; \text{"this"} \\[2pt]
+  \;&\mid\; \text{Identifier}\;( \text{ID} ) \\[2pt]
+  \;&\mid\; (\,\text{Expression}\,) \\[2pt]
+  \;&\mid\; \text{Primary}\;.\;\text{Identifier} \\[2pt]
+  \;&\mid\; \text{Identifier}\;( [\;\text{ArgumentList}\;] ) \\[4pt]
+% ArgumentList
+\textbf{ArgumentList}
+  \;&::=\; \text{Expression}
+   \;|\;\text{Expression}\;,\;\text{ArgumentList} \\[4pt]
+% END
+\textbf{END}
+  \;&::=\; \text{SEMICOLON}
+   \;|\;\text{ENDL} \\[4pt]
+% Identifier
+\textbf{Identifier}
+  \;&::=\; \text{ID} \\[4pt]
+\end{alignat*}
+
+\end{document}
