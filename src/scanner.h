@@ -1,6 +1,7 @@
 #ifndef SCANNER_H
 #define SCANNER_H
 #include <string>
+
 #include "token.h"
 
 struct Scanner {
@@ -23,5 +24,4 @@ struct Scanner {
   void test();
 };
 
-
-#endif //SCANNER_H
+#endif  // SCANNER_H
