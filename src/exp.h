@@ -5,7 +5,8 @@
 #include <string>
 #include <unordered_map>
 
-#include "visitor.h"
+class Visitor;
+
 using namespace std;
 enum BinaryOp { PLUS_OP, MINUS_OP, MUL_OP, DIV_OP, LT_OP, LE_OP, EQ_OP };
 

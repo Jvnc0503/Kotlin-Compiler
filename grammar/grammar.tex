@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
@@ -22,25 +22,24 @@
 % VarDecl
 \textbf{VarDecl}
   \;&::=\; (\;\text{"var"}\;\mid\;\text{"val"}\;)\;\text{Identifier}
-     \;(\;:\;\text{Type}\;)?
-     \;=\;\text{Expression}\;\text{END} \\[4pt]
+     \;(\;\text{":"}\;\text{Type}\;)?
+     \;\text{"="}\;\text{Expression}\;\text{END} \\[4pt]
 % FunDecl
 \textbf{FunDecl}
   \;&::=\; \text{"fun"}\;\text{Identifier}
-     \;(\;[\;\text{ParamList}\;]\;)
+     \;\text{"}(\text{"}\;[\;\text{ParamList}\;]\;\text{"})\text{"}
      \;(\;:\;\text{Type}\;)?
      \;\text{Block} \\[4pt]
 % ClassDecl
 \textbf{ClassDecl}
   \;&::=\; \text{"class"}\;\text{Identifier}
-     \;\{\;\text{Declaration}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+     \;\text{"}\{\text{"}\;\text{Declaration}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\text{"}\}\text{"} \\[4pt]
 % ParamList
 \textbf{ParamList}
-  \;&::=\; \text{Parameter}
-   \;|\;\text{Parameter}\;,\;\text{ParamList} \\[4pt]
+  \;&::=\; \text{Parameter} \; \{ \; \text{","} \; \text{Parameter} \;\} \\[4pt]
 % Parameter
 \textbf{Parameter}
-  \;&::=\; \text{Identifier}\;:\;\text{Type} \\[4pt]
+  \;&::=\; \text{Identifier}\;\text{":"}\;\text{Type} \\[4pt]
 % Type
 \textbf{Type}
   \;&::=\; \text{"Int"}
@@ -48,51 +47,47 @@
    \;|\;\text{"Unit"} \\[4pt]
 % Block
 \textbf{Block}
-  \;&::=\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+  \;&::=\; \text{"}\{\text{"}\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\text{"}\}\text{"} \\[4pt]
 % Statement
 \textbf{Statement}
   \;&::=\; (\;\text{"var"}\;\mid\;\text{"val"}\;)\;\text{Identifier}
      \;(\;:\;\text{Type}\;)?
      \;=\;\text{Expression}\;\text{END} \\
   \;&\mid\; \text{Expression}\;\text{END} \\
-  \;&\mid\; \text{"if"}\;( \text{Expression} )\;\text{Statement}
+  \;&\mid\; \text{"if"}\;\text{"}(\text{"} \text{Expression} \text{"})\text{"}\;\text{Statement}
      \;[\;\text{"else"}\;\text{Statement}\;] \\[4pt]
-  \;&\mid\; \text{"while"}\;( \text{Expression} )\;\text{Statement} \\[4pt]
-  \;&\mid\; \text{"for"}\;( \text{Identifier}\;\text{"in"}\;\text{Expression}
-     \;\text{".."}\;\text{Expression} )\;\text{Statement} \\[4pt]
+  \;&\mid\; \text{"while"}\;\text{"}(\text{"} \text{Expression} \text{"})\text{"}\;\text{Statement} \\[4pt]
+  \;&\mid\; \text{"for"}\;\text{"}(\text{"}\; \text{Identifier}\;\text{"in"}\;\text{Expression}
+     \;\text{".."}\;\text{Expression} \text{"})\text{"}\;\text{Statement} \\[4pt]
   \;&\mid\; \text{"return"}\;[\;\text{Expression}\;]\;\text{END} \\[4pt]
   \;&\mid\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[4pt]
+  \;&\mid\; \text{"print"}\; ( \; \text{LogicOr} \; ) \\[4pt]
+  \;&\mid\; \text{"println"}\; ( \; \text{LogicOr} \; ) \\[4pt]
 % Expression
 \textbf{Expression}
   \;&::=\; \text{Assignment} \\[4pt]
 % Assignment
 \textbf{Assignment}
-  \;&::=\; \text{Identifier}\;=\;\text{Assignment}
+  \;&::=\; \text{Identifier}\;\text{"="}\;\text{Assignment}
    \;|\;\text{LogicOr} \\[4pt]
 % LogicOr
 \textbf{LogicOr}
-  \;&::=\; \text{LogicAnd}
-   \;|\;\text{LogicAnd}\;\text{"||"}\;\text{LogicAnd} \\[4pt]
+  \;&::=\; \text{LogicAnd} \;\text{\{ "||"}\;\text{LogicAnd \}} \\[4pt]
 % LogicAnd
 \textbf{LogicAnd}
-  \;&::=\; \text{Equality}
-   \;|\;\text{Equality}\;\text{"&&"}\;\text{Equality} \\[4pt]
+  \;&::=\; \text{Equality} \;\text{ \{"\&\&"}\;\text{Equality\}} \\[4pt]
 % Equality
 \textbf{Equality}
-  \;&::=\; \text{Comparison}
-   \;|\;\text{Comparison}\;(\text{"=="}\;\mid\;\text{"!="})\;\text{Comparison} \\[4pt]
+  \;&::=\; \text{Comparison} \; \{ \; ( \; \text{"=="}\;\mid\;\text{"!="}\;)\;\text{Comparison} \; \}   \\[4pt]
 % Comparison
 \textbf{Comparison}
-  \;&::=\; \text{Term}
-   \;|\;\text{Term}\;(\text{"<"}\;\mid\;\text{"<="}\;\mid\;\text{">"}\;\mid\;\text{">="})\;\text{Term} \\[4pt]
+  \;&::=\; \text{Term}\; \{\;(\text{"<"}\;\mid\;\text{"<="}\;\mid\;\text{">"}\;\mid\;\text{">="})\;\text{Term} \;\}\\[4pt]
 % Term
 \textbf{Term}
-  \;&::=\; \text{Factor}
-   \;|\;\text{Factor}\;(\text{"+"}\;\mid\;\text{"-"})\;\text{Factor} \\[4pt]
+  \;&::=\; \text{Factor}\;\{ \;(\text{"+"}\;\mid\;\text{"-"})\;\text{Factor}\; \} \\[4pt]
 % Factor
 \textbf{Factor}
-  \;&::=\; \text{Unary}
-   \;|\;\text{Unary}\;(\text{"*"}\;\mid\;\text{/"})\;\text{Unary} \\[4pt]
+  \;&::=\; \text{Unary}\;\{ \;(\text{"*"}\;\mid\;\text{/"})\;\text{Unary}\; \} \\[4pt]
 % Unary
 \textbf{Unary}
   \;&::=\; (\;\text{"!"}\;\mid\;\text{"-"}\;)\;\text{Unary}
@@ -100,16 +95,15 @@
 % Primary
 \textbf{Primary}
   \;&::=\; \text{IntegerLiteral}\;( \text{INT\_LITERAL} ) \\[2pt]
-  \;&\mid\; \text{BooleanLiteral}\;( \text{"true"}\;\mid\;\text{"false"} ) \\[2pt]
+  \;&\mid\; ( \text{"true"}\;\mid\;\text{"false"} ) \\[2pt]
   \;&\mid\; \text{"this"} \\[2pt]
-  \;&\mid\; \text{Identifier}\;( \text{ID} ) \\[2pt]
-  \;&\mid\; (\,\text{Expression}\,) \\[2pt]
-  \;&\mid\; \text{Primary}\;.\;\text{Identifier} \\[2pt]
-  \;&\mid\; \text{Identifier}\;( [\;\text{ArgumentList}\;] ) \\[4pt]
+  \;&\mid\; \text{Identifier} \\[2pt]
+  \;&\mid\; \text{"}(\text{"}\,\text{Expression}\,\text{"})\text{"} \\[2pt]
+  \;&\mid\; \text{Primary}\;\text{"."}\;\text{Identifier} \\[2pt]
+  \;&\mid\; \text{Identifier}\;\text{"}(\text{"} \; [\;\text{ArgumentList}\;]\; \text{"})\text{"} \\[4pt]
 % ArgumentList
 \textbf{ArgumentList}
-  \;&::=\; \text{Expression}
-   \;|\;\text{Expression}\;,\;\text{ArgumentList} \\[4pt]
+  \;&::=\; \text{Expression}\; \{ \;,\;\text{Expression} \; \} \\[4pt]
 % END
 \textbf{END}
   \;&::=\; \text{SEMICOLON}
