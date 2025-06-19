@@ -1,36 +1,44 @@
-//
-// Created by m41k1 on 6/13/25.
-//
-
 #ifndef PARSER_H
 #define PARSER_H
 
-
-#include "scanner.h"
 #include "exp.h"
+#include "iostream"
+#include "scanner.h"
 
 class Parser {
-private:
+   private:
     Scanner* scanner;
     Token *current, *previous;
     bool match(Token::Type ttype);
     bool check(Token::Type ttype);
     bool advance();
     bool isAtEnd();
-    Exp* parseCExp();
+    list<Stm*> parseStmList();
     Exp* parseExpression();
+    Exp* parseLogicAnd();
+    Exp* parseEquality();
+    Exp* parseComparison();
     Exp* parseTerm();
     Exp* parseFactor();
-public:
+    Exp* parseUnary();
+    Exp* parsePrimary();
+    static void errorHandler(string token, string regla) {
+        std::cout << "Error: se esperaba un " << token << " en " << regla << std::endl;
+        exit(1);
+    }
+
+   public:
     Parser(Scanner* scanner);
     Program* parseProgram();
     Stm* parseStatement();
-    StatementList* parseStatementList();
+    StmtList* parseStatementList();
     VarDec* parseVarDec();
     VarDecList* parseVarDecList();
-    Body* parseBody();
-    
+    Block* parseBlock();
+    FunDecList* parseFunDecList();
+    FunDec* parseFunDec();
+    ClassDecList* parseClassDecList();
+    ClassDec* parseClassDec();
 };
 
-
-#endif //PARSER_H
+#endif  // PARSER_H
