@@ -13,9 +13,9 @@
 \begin{alignat*}{2}
 % Program
 \textbf{Program}
-  \;&::=  \; \text{VarDecList} \;[\;\text{END}\;]\;
-    \; \text{FunDecList} \;[\;\text{END}\;]\;
-    \;\text{ClassDecList} \;[\;\text{END}\;]\; \\[3pt]
+  \;&::=  \; \text{VarDecList} 
+    \; \text{FunDecList} 
+    \;\text{ClassDecList}  \\[3pt]
 % VarDecList
 \textbf{VarDecList}
 \;&::= \{ \; \text{VarDec}\; \} \\[3pt]
@@ -53,9 +53,9 @@
    \;|\;\textbf{Unit} \\[3pt]
 % Block
 \textbf{Block}
-  \;&::=\; \text{VarDec}  \; \text{StmtDec} \; \\[3pt]
+  \;&::=\; \text{VarDecList}  \; \text{StmtList} \; \\[3pt]
 % StmtDecl
-\textbf{StmtDec}
+\textbf{StmtList}
   \;&::=\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[3pt]
 % Statement
 \textbf{Statement}
