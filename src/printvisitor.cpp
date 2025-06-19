@@ -62,14 +62,14 @@ int PrintVisitor::visit(IfStatement* stm) {
 
 int PrintVisitor::visit(ForStatement* stm) {
     cout << "for( ";
-    stm->id;
+    cout << stm->begin->id;
     cout << " in ";
-    stm->begin->accept(this);
+    stm->begin->rhs->accept(this);
     cout << " .. ";
     stm->end->accept(this);
-    cout << " ) {" << endl;
+    cout << " ) {";
     stm->block->accept(this);
-    cout << " \n}" << endl;
+    cout << "}";
     return 0;
 }
 
@@ -114,6 +114,11 @@ int PrintVisitor::visit(Block* stm) {
 }
 
 int PrintVisitor::visit(WhileStatement* stm) {
+    cout << "while (";
+    stm->condition->accept(this);
+    cout << " ) {";
+    stm->block->accept(this);
+    cout << "}";
     return 0;
 }
 
@@ -124,6 +129,5 @@ int PrintVisitor::visit(ReturnStatement* stm) {
 int PrintVisitor::visit(UnaryExp* e) {
     e->op == UnaryOp::NOT_OP ? cout << "!" : cout << "-";
     e->exp->accept(this);
-
     return 0;
 }
