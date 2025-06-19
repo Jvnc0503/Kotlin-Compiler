@@ -5,23 +5,23 @@
 #include "token.h"
 
 struct Scanner {
-  std::string input;
-  int first, current, line = 1, column = 1;
-  bool precededBySemicolon = false;
+    std::string input;
+    int first, current, line = 1, column = 1;
+    bool precededBySemicolon = false;
 
-  explicit Scanner(std::string input);
+    explicit Scanner(std::string input);
 
-  ~Scanner() = default;
+    ~Scanner() = default;
 
-  static bool is_white_space(char c);
+    static bool is_white_space(char c);
 
-  static bool is_id_char(char c);
+    static bool is_id_char(char c);
 
-  Token *nextToken();
+    Token* nextToken();
 
-  void reset();
+    void reset();
 
-  void test();
+    void test();
 };
 
 #endif  // SCANNER_H
