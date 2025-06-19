@@ -4,12 +4,15 @@
 
 #include "visitor.h"
 
-
 int BinaryExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
 int NumberExp::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int UnaryExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
@@ -45,10 +48,18 @@ int VarDecList::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
-int StatementList::accept(Visitor* visitor) {
+int StmtList::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
 
-int Body::accept(Visitor* visitor) {
+int Block::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int WhileStatement::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int ReturnStatement::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
