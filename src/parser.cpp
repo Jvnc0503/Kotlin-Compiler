@@ -1,8 +1,6 @@
 #include "parser.h"
-
 #include <iostream>
 #include <stdexcept>
-
 #include "exp.h"
 #include "scanner.h"
 #include "token.h"
@@ -13,21 +11,25 @@ bool Parser::match(Token::Type ttype) {
     if (check(ttype)) {
         advance();
         return true;
+    } else {
+        return false;
     }
-    return false;
 }
 
 bool Parser::check(Token::Type ttype) {
-    if (isAtEnd())
+    if (isAtEnd()) {
         return false;
-    return current->type == ttype;
+    } else {
+        return current->type == ttype;
+    }
 }
 
 bool Parser::advance() {
     if (!isAtEnd()) {
         Token* temp = current;
-        if (previous)
+        if (previous) {
             delete previous;
+        }
         current = scanner->nextToken();
         previous = temp;
         if (check(Token::ERROR)) {
@@ -35,12 +37,19 @@ bool Parser::advance() {
             exit(1);
         }
         return true;
+    } else {
+        return false;
     }
-    return false;
 }
 
 bool Parser::isAtEnd() {
-    return (current->type == Token::ENDOFFILE);
+    return current->type == Token::ENDOFFILE;
+}
+
+void Parser::consumeENDL() {
+    while (check(Token::ENDL)) {
+        advance();
+    }
 }
 
 Parser::Parser(Scanner* sc) : scanner(sc) {
@@ -53,111 +62,101 @@ Parser::Parser(Scanner* sc) : scanner(sc) {
 }
 
 Program* Parser::parseProgram() {
+    consumeENDL();
     Program* p = new Program();
     p->vl = parseVarDecList();
+    consumeENDL();
     p->stml = parseStatementList();
-    //    p->fl = parseFunDecList();
-    //    p->cl = parseClassDecList();
+    consumeENDL();
     return p;
 }
 
 VarDecList* Parser::parseVarDecList() {
+    consumeENDL();
     VarDecList* vdl = new VarDecList();
     VarDec* aux = parseVarDec();
-    while (aux != nullptr) {
+    while (aux) {
         vdl->add(aux);
+        consumeENDL();
         aux = parseVarDec();
     }
     return vdl;
 }
 
-// FunDecList* Parser::parseFunDecList() {
-//    FunDecList* fdl = new FunDecList();
-//    FunDec* aux = parseFunDec();
-//    while (aux != nullptr) {
-//       fdl->add(aux);
-//       aux = parseFunDec();
-//    }
-//    return fdl;
-// }
-
 VarDec* Parser::parseVarDec() {
+    consumeENDL();
     if (!(check(Token::VAL) || check(Token::VAR))) {
-        cout << "retornando nullptr "
-             << "current: " << current->type << endl;
         return nullptr;
-    }
-
-    VarDec* vd = new VarDec();
-
-    if (match(Token::VAL)) {
-        vd->is_mut = false;
-    } else if (match(Token::VAR)) {
-        vd->is_mut = true;
-    }
-
-    if (!match(Token::ID)) {
-        errorHandler("ID", "VarDec");
-    }
-    vd->var = previous->text;
-
-    if (!match(Token::COLON)) {
-        errorHandler("':'", "VarDec");
-    }
-
-    if (match(Token::BOOL_TYPE)) {
-        vd->type = "Boolean";
-    } else if (match(Token::INT_TYPE)) {
-        vd->type = "Int";
-    } else if (match(Token::UNIT_TYPE)) {
-        vd->type = "Unit";
     } else {
-        cout << "Error: se esperaba un tipo válido después de ':'" << endl;
-        exit(1);
+        VarDec* vd = new VarDec();
+        if (match(Token::VAL)) {
+            vd->is_mut = false;
+        } else if (match(Token::VAR)) {
+            vd->is_mut = true;
+        }
+        if (!match(Token::ID)) {
+            errorHandler("ID", "VarDec");
+        }
+        vd->var = previous->text;
+        if (!match(Token::COLON)) {
+            errorHandler("':'", "VarDec");
+        }
+        if (match(Token::BOOL_TYPE)) {
+            vd->type = "Boolean";
+        } else if (match(Token::INT_TYPE)) {
+            vd->type = "Int";
+        } else if (match(Token::UNIT_TYPE)) {
+            vd->type = "Unit";
+        } else {
+            cout << "Error: se esperaba un tipo válido después de ':'" << endl;
+            exit(1);
+        }
+        if (match(Token::ASSIGN)) {
+            Exp* e = parseExpression();
+            vd->exp = e;
+        }
+        if (!match(Token::ENDL)) {
+            errorHandler("ENDL", "VarDec");
+        }
+        consumeENDL();
+        return vd;
     }
-
-    if (match(Token::ASSIGN)) {
-        Exp* e = parseExpression();
-        vd->exp = e;
-    }
-
-    if (!match(Token::ENDL)) {
-        errorHandler("ENDL", "VarDec");
-    }
-
-    return vd;
 }
 
 StmtList* Parser::parseStatementList() {
+    consumeENDL();
     StmtList* sl = new StmtList();
     Stm* aux = parseStatement();
-    while (aux != nullptr) {
+    while (aux) {
         sl->add(aux);
+        consumeENDL();
         aux = parseStatement();
     }
     return sl;
 }
 
 Block* Parser::parseBlock() {
+    consumeENDL();
     Block* block = new Block();
     block->vardecl = parseVarDecList();
+    consumeENDL();
     block->stmdecl = parseStatementList();
+    consumeENDL();
     return block;
 }
 
 Stm* Parser::parseStatement() {
+    consumeENDL();
     Stm* stm = nullptr;
     Exp* e = nullptr;
     Block* tb = nullptr;
     Block* eb = nullptr;
 
     if (match(Token::IF)) {
-        IfStatement* stm = new IfStatement();
         if (!match(Token::LPAREN)) {
             errorHandler("LPAREN", "IF");
         }
         e = parseExpression();
-
         if (!match(Token::RPAREN)) {
             errorHandler("RPAREN", "IF");
         }
@@ -180,6 +179,7 @@ Stm* Parser::parseStatement() {
         if (!match(Token::ENDL)) {
             errorHandler("ENDL", "IF");
         }
+        consumeENDL();
         return new IfStatement(e, tb, eb);
     } else if (match(Token::PRINT)) {
         if (!match(Token::LPAREN)) {
@@ -192,6 +192,7 @@ Stm* Parser::parseStatement() {
         if (!match(Token::ENDL)) {
             errorHandler("ENDL", "PRINT");
         }
+        consumeENDL();
         return new PrintStatement(e, "print");
     } else if (match(Token::PRINTLN)) {
         if (!match(Token::LPAREN)) {
@@ -204,6 +205,7 @@ Stm* Parser::parseStatement() {
         if (!match(Token::ENDL)) {
             errorHandler("ENDL", "PRINTLN");
         }
+        consumeENDL();
         return new PrintStatement(e, "println");
     } else if (match(Token::ID)) {
         string var = previous->text;
@@ -214,9 +216,64 @@ Stm* Parser::parseStatement() {
         if (!match(Token::ENDL)) {
             errorHandler("ENDL", "ASSIGN");
         }
+        consumeENDL();
         return new AssignStatement(var, e);
+    } else if (match(Token::FOR)) {
+        if (!match(Token::LPAREN)) {
+            errorHandler("LPAREN", "FOR");
+        }
+        if (!match(Token::ID)) {
+            errorHandler("ID", "FOR");
+        }
+        string var = previous->text;
+        if (!match(Token::IN)) {
+            errorHandler("IN", "FOR");
+        }
+        e = parseExpression();
+        AssignStatement* astm = new AssignStatement();
+        astm->id = var;
+        astm->rhs = e;
+        if (!match(Token::RANGE)) {
+            errorHandler("RANGE", "FOR");
+        }
+        Exp* end = parseExpression();
+        if (!match(Token::RPAREN)) {
+            errorHandler("RPAREN", "FOR");
+        }
+        if (!match(Token::LBRACE)) {
+            errorHandler("LBRACE", "FOR");
+        }
+        Block* block = parseBlock();
+        if (!match(Token::RBRACE)) {
+            errorHandler("RBRACE", "FOR");
+        }
+        consumeENDL();
+        ForStatement* fstm = new ForStatement();
+        fstm->begin = astm;
+        fstm->end = end;
+        fstm->block = block;
+        return fstm;
+    } else if (match(Token::WHILE)) {
+        if (!match(Token::LPAREN)) {
+            errorHandler("LPAREN", "WHILE");
+        }
+        e = parseExpression();
+        if (!match(Token::RPAREN)) {
+            errorHandler("RPAREN", "WHILE");
+        }
+        if (!match(Token::LBRACE)) {
+            errorHandler("LBRACE", "WHILE");
+        }
+        Block* block = parseBlock();
+        if (!match(Token::RBRACE)) {
+            errorHandler("RBRACE", "WHILE");
+        }
+        return new WhileStatement(e, block);
     }
-    return stm;
+
+    else {
+        return stm;
+    }
 }
 
 Exp* Parser::parseExpression() {
@@ -225,8 +282,9 @@ Exp* Parser::parseExpression() {
         BinaryOp op = BinaryOp::OR_OP;
         Exp* right = parseLogicAnd();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseLogicAnd() {
@@ -235,19 +293,25 @@ Exp* Parser::parseLogicAnd() {
         BinaryOp op = BinaryOp::AND_OP;
         Exp* right = parseEquality();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseEquality() {
     Exp* left = parseComparison();
     if (match(Token::EQEQ) || match(Token::NEQ)) {
         BinaryOp op;
-        previous->text == "==" ? op = BinaryOp::EQ_OP : op = BinaryOp::NE_OP;
+        if (previous->text == "==") {
+            op = BinaryOp::EQ_OP;
+        } else {
+            op = BinaryOp::NE_OP;
+        }
         Exp* right = parseEquality();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseComparison() {
@@ -261,49 +325,64 @@ Exp* Parser::parseComparison() {
             op = BinaryOp::LE_OP;
         } else if (op_s == ">") {
             op = BinaryOp::GT_OP;
-        } else if (op_s == ">=") {
+        } else {
             op = BinaryOp::GE_OP;
         }
         Exp* right = parseTerm();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseTerm() {
     Exp* left = parseFactor();
     if (match(Token::PLUS) || match(Token::MINUS)) {
         BinaryOp op;
-        previous->text == "+" ? op = BinaryOp::PLUS_OP : op = BinaryOp::MINUS_OP;
+        if (previous->text == "+") {
+            op = BinaryOp::PLUS_OP;
+        } else {
+            op = BinaryOp::MINUS_OP;
+        }
         Exp* right = parseFactor();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseFactor() {
     Exp* left = parseUnary();
     if (match(Token::MUL) || match(Token::DIV)) {
         BinaryOp op;
-        previous->text == "*" ? op = BinaryOp::MUL_OP : op = BinaryOp::DIV_OP;
+        if (previous->text == "*") {
+            op = BinaryOp::MUL_OP;
+        } else {
+            op = BinaryOp::DIV_OP;
+        }
         Exp* right = parseUnary();
         return new BinaryExp(left, right, op);
+    } else {
+        return left;
     }
-    return left;
 }
 
 Exp* Parser::parseUnary() {
     if (match(Token::NOT) || match(Token::MINUS)) {
         UnaryOp op;
-        previous->text == "!" ? op = UnaryOp::NOT_OP : op = UnaryOp::NEG_OP;
+        if (previous->text == "!") {
+            op = UnaryOp::NOT_OP;
+        } else {
+            op = UnaryOp::NEG_OP;
+        }
         Exp* exp = parsePrimary();
         return new UnaryExp(exp, op);
+    } else {
+        return parsePrimary();
     }
-    return parsePrimary();
 }
 
 Exp* Parser::parsePrimary() {
-    Exp* e = nullptr;
     if (match(Token::INT_LITERAL)) {
         return new NumberExp(stoi(previous->text));
     } else if (match(Token::TRUE)) {
@@ -318,6 +397,8 @@ Exp* Parser::parsePrimary() {
         if (!match(Token::RPAREN)) {
             errorHandler("RPAREN", "PRIMARY");
         }
+        return e;
+    } else {
+        return nullptr;
     }
-    return e;
 }

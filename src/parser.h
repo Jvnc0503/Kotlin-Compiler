@@ -26,6 +26,7 @@ class Parser {
         std::cout << "Error: se esperaba un " << token << " en " << regla << std::endl;
         exit(1);
     }
+    void consumeENDL();
 
    public:
     Parser(Scanner* scanner);
