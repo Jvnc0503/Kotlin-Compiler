@@ -127,8 +127,7 @@ class ReturnStatement : public Stm {
 
 class ForStatement : public Stm {
    public:
-    string id;
-    Exp* begin;
+    AssignStatement* begin;
     Exp* end;
     Block* block;
     ForStatement(){};
