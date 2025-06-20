@@ -217,6 +217,7 @@ class VarDec {
     bool is_mut;
     string type;
     string var;
+    bool is_implicit;
     AssignStatement* stm;
     VarDec(){};
     int accept(Visitor* visitor);
