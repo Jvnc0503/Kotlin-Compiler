@@ -2,45 +2,34 @@
 
 Exp* Parser::parseExpression() {
     Exp* left = parseLogicAnd();
-    if (match(Token::OR)) {
-        BinaryOp op = BinaryOp::OR_OP;
+    while (match(Token::OR)) {
         Exp* right = parseLogicAnd();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+        left = new BinaryExp(left, right, OR_OP);
     }
+    return left;
 }
 
 Exp* Parser::parseLogicAnd() {
     Exp* left = parseEquality();
-    if (match(Token::AND)) {
-        BinaryOp op = BinaryOp::AND_OP;
+    while (match(Token::AND)) {
         Exp* right = parseEquality();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+        left = new BinaryExp(left, right, AND_OP);
     }
+    return left;
 }
 
 Exp* Parser::parseEquality() {
     Exp* left = parseComparison();
-    if (match(Token::EQEQ) || match(Token::NEQ)) {
-        BinaryOp op;
-        if (previous->text == "==") {
-            op = BinaryOp::EQ_OP;
-        } else {
-            op = BinaryOp::NE_OP;
-        }
-        Exp* right = parseEquality();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+    while (match(Token::EQEQ) || match(Token::NEQ)) {
+        BinaryOp op = (previous->type == Token::EQEQ) ? EQ_OP : NE_OP;
+        Exp* right = parseComparison();
+        left = new BinaryExp(left, right, op);
     }
+    return left;
 }
-
 Exp* Parser::parseComparison() {
     Exp* left = parseTerm();
-    if (match(Token::LT) || match(Token::LTE) || match(Token::GTE) || match(Token::GT)) {
+    while (match(Token::LT) || match(Token::LTE) || match(Token::GT) || match(Token::GTE)) {
         BinaryOp op;
         switch (previous->type) {
             case Token::LT:
@@ -56,45 +45,32 @@ Exp* Parser::parseComparison() {
                 op = GE_OP;
                 break;
             default:
-                op = GE_OP;
+                op = GE_OP;  // nunca debería suceder
         }
         Exp* right = parseTerm();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+        left = new BinaryExp(left, right, op);
     }
+    return left;
 }
 
 Exp* Parser::parseTerm() {
     Exp* left = parseFactor();
-    if (match(Token::PLUS) || match(Token::MINUS)) {
-        BinaryOp op;
-        if (previous->text == "+") {
-            op = BinaryOp::PLUS_OP;
-        } else {
-            op = BinaryOp::MINUS_OP;
-        }
+    while (match(Token::PLUS) || match(Token::MINUS)) {
+        BinaryOp op = (previous->type == Token::PLUS) ? PLUS_OP : MINUS_OP;
         Exp* right = parseFactor();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+        left = new BinaryExp(left, right, op);
     }
+    return left;
 }
 
 Exp* Parser::parseFactor() {
     Exp* left = parseUnary();
-    if (match(Token::MUL) || match(Token::DIV)) {
-        BinaryOp op;
-        if (previous->text == "*") {
-            op = BinaryOp::MUL_OP;
-        } else {
-            op = BinaryOp::DIV_OP;
-        }
+    while (match(Token::MUL) || match(Token::DIV)) {
+        BinaryOp op = (previous->type == Token::MUL) ? MUL_OP : DIV_OP;
         Exp* right = parseUnary();
-        return new BinaryExp(left, right, op);
-    } else {
-        return left;
+        left = new BinaryExp(left, right, op);
     }
+    return left;
 }
 
 Exp* Parser::parseUnary() {
@@ -121,10 +97,14 @@ Exp* Parser::parsePrimary() {
         return new BoolExp(0);
     } else if (match(Token::ID)) {
         string nombre = previous->text;
-        if (match(Token::LBRACE)) {
+        if (match(Token::LPAREN)) {
             FCallExp* fcall = new FCallExp();
             fcall->nombre = nombre;
             fcall->argumentos = parseArguments();
+            cout << current -> text << endl;
+            if (!match(Token:: RPAREN)) {
+                errorHandler("RPAREN", "FCALL");
+            }
             return fcall;
         } else {
             return new IdentifierExp(nombre);
@@ -140,13 +120,16 @@ Exp* Parser::parsePrimary() {
         return nullptr;
     }
 }
-
 vector<Exp*> Parser::parseArguments() {
-    vector<Exp*> arguments;
-    Exp* aux = parseExpression();
-    while (aux) {
-        arguments.push_back(aux);
-        aux = parseExpression();
-    }
-    return arguments;
+    vector<Exp*> args;
+
+    if (check(Token::RPAREN))
+        return args;
+
+    do {
+        Exp* e = parseExpression();   
+        args.push_back(e);
+    } while (match(Token::COMMA));    
+
+    return args;                      
 }

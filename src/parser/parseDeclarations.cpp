@@ -17,41 +17,64 @@ VarDec* Parser::parseVarDec() {
     if (!(check(Token::VAL) || check(Token::VAR))) {
         return nullptr;
     } else {
-        VarDec* vd = new VarDec();
+        bool is_mut;
+        string name;
         if (match(Token::VAL)) {
-            vd->is_mut = false;
+            is_mut = false;
         } else if (match(Token::VAR)) {
-            vd->is_mut = true;
+            is_mut = true;
         }
         if (!match(Token::ID)) {
             errorHandler("ID", "VarDec");
         }
-        vd->var = previous->text;
-        string var = previous->text;
-        if (!match(Token::COLON)) {
-            errorHandler("':'", "VarDec");
-        }
-        if (match(Token::BOOL_TYPE)) {
-            vd->type = "Boolean";
-        } else if (match(Token::INT_TYPE)) {
-            vd->type = "Int";
-        } else if (match(Token::UNIT_TYPE)) {
-            vd->type = "Unit";
+        name = previous->text;
+        if (match(Token::COLON)) {
+            return handleVarDecWithExplicitType(is_mut, name);
         } else {
-            cout << "Error: se esperaba un tipo válido después de ':'" << endl;
-            exit(1);
+            return handleVarDecWithImplicitType(is_mut, name);
         }
-        if (match(Token::ASSIGN)) {
-            Exp* e = parseExpression();
-            AssignStatement* stm = new AssignStatement(var, e);
-            vd->stm = stm;
-        }
-        if (!match(Token::ENDL)) {
-            errorHandler("ENDL", "VarDec");
-        }
-        consumeENDL();
-        return vd;
     }
+}
+
+VarDec* Parser::handleVarDecWithImplicitType(bool is_mut, string name) {
+    VarDec* vd = new VarDec();
+    vd->is_mut = is_mut;
+    vd->var = name;
+    vd->is_implicit = true;
+    if (!match(Token::ASSIGN)) {
+        errorHandler("ASSIGN", "VARDEC");
+    }
+    Exp* e = parseExpression();
+    AssignStatement* astm = new AssignStatement(name, e);
+    vd->stm = astm;
+    return vd;
+}
+
+VarDec* Parser::handleVarDecWithExplicitType(bool is_mut, string name) {
+    VarDec* vd = new VarDec();
+    vd->is_mut = is_mut;
+    vd->var = name;
+    vd->is_implicit = false;
+    if (match(Token::BOOL_TYPE)) {
+        vd->type = "Boolean";
+    } else if (match(Token::INT_TYPE)) {
+        vd->type = "Int";
+    } else if (match(Token::UNIT_TYPE)) {
+        vd->type = "Unit";
+    } else {
+        cout << "Error: se esperaba un tipo válido después de ':'" << endl;
+        exit(1);
+    }
+    if (match(Token::ASSIGN)) {
+        Exp* e = parseExpression();
+        AssignStatement* stm = new AssignStatement(name, e);
+        vd->stm = stm;
+    }
+    if (!match(Token::ENDL)) {
+        errorHandler("ENDL", "VarDec");
+    }
+    consumeENDL();
+    return vd;
 }
 
 FunDecList* Parser::parseFunDecList() {
@@ -87,25 +110,24 @@ FunDec* Parser::parseFunDec() {
     if (!match(Token::RPAREN)) {
         errorHandler("RPAREN", "FUNDEC");
     }
-    if (!match(Token::COLON)) {
-        errorHandler("COLON", "FUNDEC");
+    if (match(Token::COLON)) {
+        if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE)) {
+            errorHandler("TYPE", "FUNDEC");
+        }
+        fundec->type = previous->text;
+    } else {
+        fundec->type = "unit";
     }
-    if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE)) {
-        errorHandler("TYPE", "FUNDEC");
-    }
-    string type = previous->text;
     if (!match(Token::LBRACE)) {
         errorHandler("LBRACE", "FUNDEC");
     }
     Block* block = parseBlock();
     if (!match(Token::RBRACE)) {
-        cout << current->text << endl;
         errorHandler("RBRACE", "FUNDEC");
     }
     fundec->block = block;
     fundec->paramList = paramlist;
     fundec->id = id;
-    fundec->type = type;
     return fundec;
 }
 
@@ -128,16 +150,25 @@ ParamList* Parser::parseParamList() {
     return pl;
 }
 Param* Parser::parseParam() {
-    if (match(Token::ID)) {
-        string id = previous->text;
-        if (!match(Token::COLON)) {
-            errorHandler("COLON", "PARAM");
-        }
-        if (!match(Token::ID)) {
-            errorHandler("ID", "PARAM");
-        }
-        string type = previous->text;
-        return new Param(id, type);
+    if (!match(Token::ID)) {
+        return nullptr;
     }
-    return nullptr;
+    std::string id = previous->text;
+
+    if (!match(Token::COLON)) {
+        errorHandler("COLON", "PARAM");
+    }
+
+    std::string type;
+    if (match(Token::INT_TYPE)) {
+        type = "Int";
+    } else if (match(Token::BOOL_TYPE)) {
+        type = "Boolean";
+    } else if (match(Token::UNIT_TYPE)) {
+        type = "Unit";
+    } else {
+        errorHandler("TYPE", "PARAM");
+    }
+
+    return new Param(id, type);
 }

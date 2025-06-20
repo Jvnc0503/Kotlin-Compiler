@@ -33,6 +33,8 @@ class Parser {
     ForStatement* handleForStatement();
     WhileStatement* handleWhileStatement();
     AssignStatement* handleAssignStatement();
+    VarDec* handleVarDecWithImplicitType(bool is_mut, string name);
+    VarDec* handleVarDecWithExplicitType(bool is_mut, string name);
 
    public:
     Parser(Scanner* scanner);

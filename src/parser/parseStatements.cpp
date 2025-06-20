@@ -85,6 +85,7 @@ PrintStatement* Parser::handlePrintStatement() {
     }
     e = parseExpression();
     if (!match(Token::RPAREN)) {
+        cout << current->text << endl;
         errorHandler("RPAREN", "PRINT");
     }
     if (!match(Token::ENDL)) {
