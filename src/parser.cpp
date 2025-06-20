@@ -66,7 +66,7 @@ Program* Parser::parseProgram() {
     Program* p = new Program();
     p->vl = parseVarDecList();
     consumeENDL();
-    p->stml = parseStatementList();
+    p->fl = parseFunDecList();
     consumeENDL();
     return p;
 }
@@ -121,6 +121,94 @@ VarDec* Parser::parseVarDec() {
         consumeENDL();
         return vd;
     }
+}
+
+FunDecList* Parser::parseFunDecList() {
+    consumeENDL();
+    FunDecList* fdl = new FunDecList();
+    
+    FunDec* aux = parseFunDec();
+    while (aux) {
+        fdl->add(aux);
+        consumeENDL();
+        aux = parseFunDec();
+    }
+    return fdl;
+}
+
+FunDec* Parser::parseFunDec() {
+    consumeENDL();
+    if (!check(Token::FUN)) {
+        return nullptr;
+    }
+    FunDec* fundec = new FunDec();
+    if (!match(Token::FUN)) {
+        errorHandler("FUN", "FUNDEC");
+    }
+    if (!match(Token::ID)) {
+        errorHandler("ID", "FUNDEC");
+    }
+    string id = previous->text;
+    if (!match(Token::LPAREN)) {
+        errorHandler("LPAREN", "FUNDEC");
+    }
+    ParamList* paramlist = parseParamList();
+    if (!match(Token::RPAREN)) {
+        errorHandler("RPAREN", "FUNDEC");
+    }
+    if (!match(Token::COLON)) {
+        errorHandler("COLON", "FUNDEC");
+    }
+    if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE)) {
+        errorHandler("TYPE", "FUNDEC");
+    }
+    string type = previous->text;
+    if (!match(Token::LBRACE)) {
+        errorHandler("LBRACE", "FUNDEC");
+    }
+    Block* block = parseBlock();
+    if (!match(Token::RBRACE)) {
+        cout << current->text <<  endl;
+        errorHandler("RBRACE", "FUNDEC");
+    }
+    fundec->block = block;
+    fundec->paramList = paramlist;
+    fundec->id = id;
+    fundec->type = type;
+    return fundec;
+}
+
+ParamList* Parser::parseParamList() {
+    ParamList* pl = new ParamList();
+
+    Param* param = parseParam();
+    if (!param) {
+        return pl;
+    }
+    pl->add(param);
+    while (match(Token::COMMA)) {
+        consumeENDL();
+        param = parseParam();
+        if (!param) {
+            errorHandler("PARAM", "PARAMLIST");
+        }
+        pl->add(param);
+    }
+    return pl;
+}
+Param* Parser::parseParam() {
+    if (match(Token::ID)) {
+        string id = previous->text;
+        if (!match(Token::COLON)) {
+            errorHandler("COLON", "PARAM");
+        }
+        if (!match(Token::ID)) {
+            errorHandler("ID", "PARAM");
+        }
+        string type = previous->text;
+        return new Param(id, type);
+    }
+    return nullptr;
 }
 
 StmtList* Parser::parseStatementList() {
@@ -269,6 +357,9 @@ Stm* Parser::parseStatement() {
             errorHandler("RBRACE", "WHILE");
         }
         return new WhileStatement(e, block);
+    } else if (match(Token::RETURN)) {
+        Exp* e = parseExpression();
+        return new ReturnStatement(e);
     }
 
     else {
@@ -391,7 +482,15 @@ Exp* Parser::parsePrimary() {
         return new BoolExp(0);
     } else if (match(Token::ID)) {
         string nombre = previous->text;
-        return new IdentifierExp(nombre);
+        if (match(Token::LBRACE)) {
+            FCallExp* fcall = new FCallExp();
+            fcall->nombre = nombre;
+            fcall->argumentos = parseArguments();
+            return fcall;
+        } else {
+            return new IdentifierExp(nombre);
+        }
+
     } else if (match(Token::LPAREN)) {
         Exp* e = parseExpression();
         if (!match(Token::RPAREN)) {
@@ -401,4 +500,14 @@ Exp* Parser::parsePrimary() {
     } else {
         return nullptr;
     }
+}
+
+list<Exp*> Parser::parseArguments() {
+    list<Exp*> arguments;
+    Exp* aux = parseExpression();
+    while (aux) {
+        arguments.push_back(aux);
+        aux = parseExpression();
+    }
+    return arguments;
 }
