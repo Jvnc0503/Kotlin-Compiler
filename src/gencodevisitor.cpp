@@ -125,7 +125,6 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
     return 0;
 }
 
-
 int GenCodeVisitor::visit(AssignStatement* stm) {
     stm->rhs->accept(this);
     if (memoriaGlobal.count(stm->id))

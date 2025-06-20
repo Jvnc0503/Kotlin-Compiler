@@ -49,6 +49,7 @@ class Visitor {
     virtual int visit(FunDec* f) = 0;
     virtual int visit(FunDecList* fl) = 0;
     virtual int visit(FCallExp* fcall) = 0;
+    virtual int visit(Program* p) = 0;
 };
 
 class PrintVisitor : public Visitor {
@@ -74,6 +75,7 @@ class PrintVisitor : public Visitor {
     int visit(FunDec* f) override;
     int visit(FunDecList* fl) override;
     int visit(FCallExp* fcall) override;
+    int visit(Program* p) override;
 };
 
 class TypeCheckerVisitor : public Visitor {
@@ -101,15 +103,24 @@ class TypeCheckerVisitor : public Visitor {
     int visit(FunDec* f) override;
     int visit(FunDecList* fl) override;
     int visit(FCallExp* fcall) override;
+    int visit(Program* p) override;
 };
 
 class GenCodeVisitor : public Visitor {
+   private:
+    bool recolectando = false;
+    std::ostream& out;
+
    public:
-    std::unordered_map<std::string, int> memoria;
-    int cantidad;
-    int for_count;
-    std::stack<int> for_stack;
-    int gencode(Program* program);
+    GenCodeVisitor(std::ostream& out) : out(out) {}
+
+    void generar(Program* program);
+    unordered_map<string, int> memoria;
+    unordered_map<string, bool> memoriaGlobal;
+    int offset = -8;
+    int labelcont = 0;
+    bool entornoFuncion = false;
+    string nombreFuncion;
     int visit(BinaryExp* exp) override;
     int visit(UnaryExp* exp) override;
     int visit(NumberExp* exp) override;
@@ -130,6 +141,7 @@ class GenCodeVisitor : public Visitor {
     int visit(FunDec* f) override;
     int visit(FunDecList* fl) override;
     int visit(FCallExp* fcall) override;
+    int visit(Program* p) override;
 };
 
 #endif  // VISITOR_H

@@ -1,5 +1,9 @@
 #include "visitor.h"
 
+int PrintVisitor::visit(Program* program) {
+    return 0;
+}
+
 int PrintVisitor::visit(BinaryExp* exp) {
     exp->left->accept(this);
     cout << ' ' << Exp::binopToString(exp->op) << ' ';
@@ -74,17 +78,19 @@ int PrintVisitor::visit(ForStatement* stm) {
 }
 
 int PrintVisitor::imprimir(Program* program) {
-    if (program->vl)   program->vl->accept(this);
-    if (program->fl)   program->fl->accept(this);   
+    if (program->vl)
+        program->vl->accept(this);
+    if (program->fl)
+        program->fl->accept(this);
     return 0;
 }
-int PrintVisitor::visit(VarDec* stm) {
-    stm->is_mut ? cout << "var " : cout << "val ";
-    cout << stm->var;
-    cout << " :" << stm->type;
-    if (stm->exp != nullptr) {
+int PrintVisitor::visit(VarDec* s) {
+    s->is_mut ? cout << "var " : cout << "val ";
+    cout << s->var;
+    cout << " :" << s->type;
+    if (s->stm != nullptr) {
         cout << " = ";
-        stm->exp->accept(this);
+        s->stm->rhs->accept(this);
     };
     return 0;
 }
@@ -121,7 +127,7 @@ int PrintVisitor::visit(WhileStatement* stm) {
 }
 
 int PrintVisitor::visit(ReturnStatement* stm) {
-    cout << "return "; 
+    cout << "return ";
     stm->ret->accept(this);
     return 0;
 }

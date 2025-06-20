@@ -83,3 +83,7 @@ int FunDecList::accept(Visitor* visitor) {
 int FCallExp::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
+
+int Program::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}

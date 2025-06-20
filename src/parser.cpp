@@ -412,11 +412,20 @@ Exp* Parser::parseComparison() {
     if (match(Token::LT) || match(Token::LTE) || match(Token::GTE) || match(Token::GT)) {
         BinaryOp op;
         switch (previous->type) {
-            case Token::LT:  op = LT_OP;  break;
-            case Token::LTE: op = LE_OP;  break;
-            case Token::GT:  op = GT_OP;  break;
-            case Token::GTE: op = GE_OP;  break;
-            default:         op = GE_OP;  // nunca debería caer aquí
+            case Token::LT:
+                op = LT_OP;
+                break;
+            case Token::LTE:
+                op = LE_OP;
+                break;
+            case Token::GT:
+                op = GT_OP;
+                break;
+            case Token::GTE:
+                op = GE_OP;
+                break;
+            default:
+                op = GE_OP;  // nunca debería caer aquí
         }
         Exp* right = parseTerm();
         return new BinaryExp(left, right, op);
