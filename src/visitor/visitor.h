@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include "exp.h"
+#include "exp/exp.h"
 
 class BinaryExp;
 class NumberExp;

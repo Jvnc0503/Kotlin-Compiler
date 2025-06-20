@@ -8,11 +8,6 @@ main:
  movq $0, %rax
  movq %rax, -8(%rbp)
  subq $16, %rsp
- movq $2, %rax
- movq %rax, %rsi
- leaq print_fmt(%rip), %rdi
- movl $0, %eax
- call printf@PLT
 while_0:
  movq -8(%rbp), %rax
  pushq %rax

@@ -1,54 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Verificar argumento
-if [ $# -ne 1 ]; then
+# ─────────────────────────── VALIDACIÓN ───────────────────────────
+if [[ $# -ne 1 ]]; then
   echo "Uso: $0 <archivo_de_entrada>"
   exit 1
 fi
 
-INPUT_FILE="$1"
+INPUT_FILE=$1
+[[ -f $INPUT_FILE ]] || { echo "El archivo '$INPUT_FILE' no existe."; exit 1; }
 
-if [ ! -f "$INPUT_FILE" ]; then
-  echo "El archivo '$INPUT_FILE' no existe."
-  exit 1
-fi
+# ────────────────────────── RUTAS BÁSICAS ─────────────────────────
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+SRC_DIR="$ROOT_DIR/src"
+BIN_DIR="$ROOT_DIR/ejecutables"
 
-# Entrar al directorio src/
-cd src || { echo "No se encontró el directorio src/"; exit 1; }
+mkdir -p "$BIN_DIR"
 
+# ──────────────────────── COMPILAR EL COMPILADOR ──────────────────
 echo "Compilando programa C++..."
 g++ -std=c++20 \
-    main.cpp exp.cpp parser.cpp scanner.cpp token.cpp visitor.cpp \
-    printvisitor.cpp gencodevisitor.cpp \
-    -o x
+    -I"$SRC_DIR" \
+    $(find "$SRC_DIR" -name '*.cpp') \
+    -o "$BIN_DIR/x"
 
-if [ $? -ne 0 ]; then
-  echo "Fallo la compilación del programa."
-  exit 1
-fi
-echo "Compilacion exitosa"
-echo " "
-echo "Ejecutando el archivo de entrada: $INPUT_FILE"
-./x "../$INPUT_FILE"
-if [ $? -ne 0 ]; then
-  echo "Fallo la ejecución del parser."
-  exit 1
-fi
+echo "Compilación exitosa"
 
-# Compilar el output.s generado
-ASM_FILE="output.s"
-if [ ! -f "$ASM_FILE" ]; then
-  echo "No se encontró el archivo ensamblador $ASM_FILE"
-  exit 1
-fi
+# ───────────────────── EJECUTAR EL COMPILADOR ─────────────────────
+echo -e "\nEjecutando el archivo de entrada: $INPUT_FILE"
+pushd "$BIN_DIR" >/dev/null
+./x "$ROOT_DIR/$INPUT_FILE"
+popd >/dev/null
 
-echo " "
-echo "Compilando output.s con gcc..."
-gcc "$ASM_FILE" -o output_exec
-if [ $? -ne 0 ]; then
-  echo "Fallo la compilación del ensamblador."
-  exit 1
-fi
-echo " "
-echo "Ejecutando programa generado:"
-./output_exec
+# ───────────────────────── ENSAMBLAR output.s ─────────────────────
+ASM_FILE="$BIN_DIR/output.s"
+[[ -f $ASM_FILE ]] || { echo "No se encontró $ASM_FILE"; exit 1; }
+
+echo -e "\nCompilando output.s con gcc..."
+gcc "$ASM_FILE" -o "$BIN_DIR/output_exec"
+
+echo -e "\nEjecutando programa generado:"
+"$BIN_DIR/output_exec"

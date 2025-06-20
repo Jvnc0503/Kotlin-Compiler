@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "visitor.h"
+#include "scanner/token.h"
 
 using namespace std;
 

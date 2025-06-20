@@ -2,9 +2,9 @@
 #include <iostream>
 #include <string>
 
-#include "parser.h"
-#include "scanner.h"
-#include "visitor.h"
+#include "parser/parser.h"
+#include "scanner/scanner.h"
+#include "visitor/visitor.h"
 
 int main(const int argc, const char* argv[]) {
     if (argc != 2) {

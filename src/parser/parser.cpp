@@ -1,9 +1,9 @@
 #include "parser.h"
 #include <iostream>
 #include <stdexcept>
-#include "exp.h"
-#include "scanner.h"
-#include "token.h"
+#include "exp/exp.h"
+#include "scanner/scanner.h"
+#include "scanner/token.h"
 
 using namespace std;
 

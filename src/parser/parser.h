@@ -1,9 +1,9 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-#include "exp.h"
+#include "exp/exp.h"
 #include "iostream"
-#include "scanner.h"
+#include "scanner/scanner.h"
 
 class Parser {
    private:
