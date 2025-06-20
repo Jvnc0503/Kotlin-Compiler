@@ -27,7 +27,7 @@ class Parser {
         exit(1);
     }
     void consumeENDL();
-    list<Exp*> parseArguments();
+    vector<Exp*> parseArguments();
 
    public:
     Parser(Scanner* scanner);

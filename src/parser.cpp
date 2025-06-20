@@ -98,6 +98,7 @@ VarDec* Parser::parseVarDec() {
             errorHandler("ID", "VarDec");
         }
         vd->var = previous->text;
+        string var = previous->text;
         if (!match(Token::COLON)) {
             errorHandler("':'", "VarDec");
         }
@@ -113,7 +114,8 @@ VarDec* Parser::parseVarDec() {
         }
         if (match(Token::ASSIGN)) {
             Exp* e = parseExpression();
-            vd->exp = e;
+            AssignStatement* stm = new AssignStatement(var, e);
+            vd->stm = stm;
         }
         if (!match(Token::ENDL)) {
             errorHandler("ENDL", "VarDec");
@@ -126,7 +128,7 @@ VarDec* Parser::parseVarDec() {
 FunDecList* Parser::parseFunDecList() {
     consumeENDL();
     FunDecList* fdl = new FunDecList();
-    
+
     FunDec* aux = parseFunDec();
     while (aux) {
         fdl->add(aux);
@@ -168,7 +170,7 @@ FunDec* Parser::parseFunDec() {
     }
     Block* block = parseBlock();
     if (!match(Token::RBRACE)) {
-        cout << current->text <<  endl;
+        cout << current->text << endl;
         errorHandler("RBRACE", "FUNDEC");
     }
     fundec->block = block;
@@ -409,15 +411,12 @@ Exp* Parser::parseComparison() {
     Exp* left = parseTerm();
     if (match(Token::LT) || match(Token::LTE) || match(Token::GTE) || match(Token::GT)) {
         BinaryOp op;
-        string op_s = previous->text;
-        if (op_s == "<") {
-            op = BinaryOp::LT_OP;
-        } else if (op_s == "<=") {
-            op = BinaryOp::LE_OP;
-        } else if (op_s == ">") {
-            op = BinaryOp::GT_OP;
-        } else {
-            op = BinaryOp::GE_OP;
+        switch (previous->type) {
+            case Token::LT:  op = LT_OP;  break;
+            case Token::LTE: op = LE_OP;  break;
+            case Token::GT:  op = GT_OP;  break;
+            case Token::GTE: op = GE_OP;  break;
+            default:         op = GE_OP;  // nunca debería caer aquí
         }
         Exp* right = parseTerm();
         return new BinaryExp(left, right, op);
@@ -502,8 +501,8 @@ Exp* Parser::parsePrimary() {
     }
 }
 
-list<Exp*> Parser::parseArguments() {
-    list<Exp*> arguments;
+vector<Exp*> Parser::parseArguments() {
+    vector<Exp*> arguments;
     Exp* aux = parseExpression();
     while (aux) {
         arguments.push_back(aux);
