@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 class Visitor;
 
@@ -175,7 +176,7 @@ class Param {
 
 class ParamList {
    public:
-    list<Param*> param_list;
+    vector<Param*> param_list;
     ParamList() {}
     void add(Param* param) { param_list.push_back(param); };
     ~ParamList();
@@ -185,7 +186,7 @@ class ParamList {
 class FCallExp : public Exp {
    public:
     string nombre;
-    list<Exp*> argumentos;
+    vector<Exp*> argumentos;
     FCallExp(){};
     ~FCallExp(){};
     int accept(Visitor* visitor);
@@ -216,7 +217,7 @@ class VarDec {
     bool is_mut;
     string type;
     string var;
-    Exp* exp;
+    AssignStatement* stm;
     VarDec(){};
     int accept(Visitor* visitor);
     ~VarDec();
@@ -256,6 +257,7 @@ class Program {
     StmtList* stml;
     Program() : vl(nullptr), fl(nullptr), cl(nullptr), stml(nullptr) {}
     ~Program();
+    int accept(Visitor* visitor);
 };
 
 #endif

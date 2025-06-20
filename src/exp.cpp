@@ -72,7 +72,7 @@ WhileStatement::~WhileStatement() {
 }
 
 VarDec::~VarDec() {
-    delete exp;
+    delete stm;
 }
 
 VarDecList::~VarDecList() {
