@@ -74,11 +74,10 @@ int PrintVisitor::visit(ForStatement* stm) {
 }
 
 int PrintVisitor::imprimir(Program* program) {
-    program->vl->accept(this);
-    program->stml->accept(this);
+    if (program->vl)   program->vl->accept(this);
+    if (program->fl)   program->fl->accept(this);   
     return 0;
-};
-
+}
 int PrintVisitor::visit(VarDec* stm) {
     stm->is_mut ? cout << "var " : cout << "val ";
     cout << stm->var;
@@ -108,7 +107,6 @@ int PrintVisitor::visit(StmtList* stm) {
 
 int PrintVisitor::visit(Block* stm) {
     stm->vardecl->accept(this);
-    cout << endl;
     stm->stmdecl->accept(this);
     return 0;
 }
@@ -123,11 +121,60 @@ int PrintVisitor::visit(WhileStatement* stm) {
 }
 
 int PrintVisitor::visit(ReturnStatement* stm) {
+    cout << "return "; 
+    stm->ret->accept(this);
     return 0;
 }
 
 int PrintVisitor::visit(UnaryExp* e) {
     e->op == UnaryOp::NOT_OP ? cout << "!" : cout << "-";
     e->exp->accept(this);
+    return 0;
+}
+
+int PrintVisitor::visit(ParamList* pl) {
+    bool first = true;
+    for (Param* param : pl->param_list) {
+        if (!first) {
+            std::cout << ", ";
+        }
+        param->accept(this);
+        first = false;
+    }
+    return 0;
+}
+
+int PrintVisitor::visit(Param* p) {
+    std::cout << p->id << " : " << p->type;
+    return 0;
+}
+
+int PrintVisitor::visit(FunDec* fundec) {
+    cout << "fun " << fundec->id << " (";
+    fundec->paramList->accept(this);
+    cout << ") :" << fundec->type << " {" << endl;
+    fundec->block->accept(this);
+    cout << "}";
+    return 0;
+}
+
+int PrintVisitor::visit(FunDecList* fl) {
+    for (auto f : fl->fundecs) {
+        f->accept(this);
+    }
+    return 0;
+}
+
+int PrintVisitor::visit(FCallExp* exp) {
+    cout << exp->nombre << "( ";
+    bool first = true;
+    for (auto e : exp->argumentos) {
+        if (!first) {
+            std::cout << ", ";
+        }
+        e->accept(this);
+        first = false;
+    }
+    cout << ")" << endl;
     return 0;
 }
