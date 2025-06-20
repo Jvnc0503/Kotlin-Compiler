@@ -28,6 +28,11 @@ class Parser {
     }
     void consumeENDL();
     vector<Exp*> parseArguments();
+    IfStatement* handleIfStatement();
+    PrintStatement* handlePrintStatement();
+    ForStatement* handleForStatement();
+    WhileStatement* handleWhileStatement();
+    AssignStatement* handleAssignStatement();
 
    public:
     Parser(Scanner* scanner);
