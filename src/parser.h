@@ -27,6 +27,7 @@ class Parser {
         exit(1);
     }
     void consumeENDL();
+    list<Exp*> parseArguments();
 
    public:
     Parser(Scanner* scanner);
@@ -40,6 +41,8 @@ class Parser {
     FunDec* parseFunDec();
     ClassDecList* parseClassDecList();
     ClassDec* parseClassDec();
+    ParamList* parseParamList();
+    Param* parseParam();
 };
 
 #endif  // PARSER_H
