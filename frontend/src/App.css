@@ -94,3 +94,25 @@ h3 {
     height: auto;
   }
 }
+
+.asm {
+  /* ajusta la altura máxima a tu gusto */
+  max-height: 70vh;
+  /* scroll vertical cuando el contenido sobrepase */
+  overflow-y: auto;
+  /* evita que las líneas se partan */
+  white-space: pre;
+  /* opcional, para mejorar visibilidad */
+  background: #1e1e1e;
+  padding: 1rem;
+  border: 1px solid #333;
+}
+
+.output {
+  max-height: 30vh;       /* ajusta altura según te convenga */
+  overflow-y: auto;       /* si sobrepasa, muestra scroll */
+  white-space: pre;       /* para respetar saltos y espacios */
+  background: #1e1e1e;    /* mismo fondo que el asm */
+  padding: 1rem;
+  border: 1px solid #333;
+}
