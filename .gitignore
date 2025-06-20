@@ -12,4 +12,4 @@ compiler/*.zip
 compiler/*.tar.gz
 compiler/*.rar
 compiler/*.7z
-compiler/.vscode
+.vscode
