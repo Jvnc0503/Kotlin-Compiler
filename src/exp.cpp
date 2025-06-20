@@ -45,6 +45,15 @@ IfStatement::~IfStatement() {
     delete els;
 }
 
+Param::~Param() {}
+Param::Param(string i, string t) : id(i), type(t){};
+
+ParamList::~ParamList() {
+    for (auto p : param_list) {
+        delete p;
+    }
+}
+
 ForStatement::~ForStatement() {
     delete begin;
     delete end;
