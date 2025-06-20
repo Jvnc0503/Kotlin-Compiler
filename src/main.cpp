@@ -45,11 +45,11 @@ int main(const int argc, const char* argv[]) {
             return 1;
         };
 
-        // cout << "Generando codigo ensamblador en " << outputFilename << endl;
-
-        // GenCodeVisitor codigo(outfile);
-        // codigo.generar(program);
-        // outfile.close();
+        cout << "\n\nGenerando codigo ensamblador en "
+             << "output.s" << endl;
+        GenCodeVisitor codigo(outfile);
+        codigo.generar(program);
+        outfile.close();
         delete program;
     } catch (const exception& e) {
         cout << "Error durante la ejecución: " << e.what() << endl;
