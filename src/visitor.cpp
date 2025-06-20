@@ -63,3 +63,23 @@ int WhileStatement::accept(Visitor* visitor) {
 int ReturnStatement::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
+
+int ParamList::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int Param::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int FunDec::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int FunDecList::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int FCallExp::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}

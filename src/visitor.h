@@ -24,6 +24,8 @@ class Program;
 class ForStatement;
 class WhileStatement;
 class ReturnStatement;
+class ParamList;
+class Param;
 
 class Visitor {
    public:
@@ -42,6 +44,11 @@ class Visitor {
     virtual int visit(ForStatement* stm) = 0;
     virtual int visit(WhileStatement* stm) = 0;
     virtual int visit(ReturnStatement* stm) = 0;
+    virtual int visit(ParamList* pl) = 0;
+    virtual int visit(Param* p) = 0;
+    virtual int visit(FunDec* f) = 0;
+    virtual int visit(FunDecList* fl) = 0;
+    virtual int visit(FCallExp* fcall) = 0;
 };
 
 class PrintVisitor : public Visitor {
@@ -62,6 +69,11 @@ class PrintVisitor : public Visitor {
     int visit(WhileStatement* stm) override;
     int visit(ReturnStatement* stm) override;
     int visit(UnaryExp* exp) override;
+    int visit(ParamList* pl) override;
+    int visit(Param* p) override;
+    int visit(FunDec* f) override;
+    int visit(FunDecList* fl) override;
+    int visit(FCallExp* fcall) override;
 };
 
 class TypeCheckerVisitor : public Visitor {
@@ -84,6 +96,11 @@ class TypeCheckerVisitor : public Visitor {
     int visit(ForStatement* stm) override;
     int visit(WhileStatement* stm) override;
     int visit(ReturnStatement* stm) override;
+    int visit(ParamList* pl) override;
+    int visit(Param* p) override;
+    int visit(FunDec* f) override;
+    int visit(FunDecList* fl) override;
+    int visit(FCallExp* fcall) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -108,6 +125,11 @@ class GenCodeVisitor : public Visitor {
     int visit(ForStatement* stm) override;
     int visit(WhileStatement* stm) override;
     int visit(ReturnStatement* stm) override;
+    int visit(ParamList* pl) override;
+    int visit(Param* p) override;
+    int visit(FunDec* f) override;
+    int visit(FunDecList* fl) override;
+    int visit(FCallExp* fcall) override;
 };
 
 #endif  // VISITOR_H
