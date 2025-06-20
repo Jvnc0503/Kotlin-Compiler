@@ -1,0 +1,18 @@
+meta {
+  name: Compile Code
+  type: http
+  seq: 2
+}
+
+post {
+  url: https://i1sq1ero35.execute-api.us-east-1.amazonaws.com/compile
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "source": "fun main() : Int {\n    var i: Int = 0\n    while (i <= 5) {\n        println(i)\n        i = i + 1\n    }\n}"
+  }
+  
+}

@@ -1,0 +1,44 @@
+service: kotlin-compiler-api
+frameworkVersion: "3"
+
+provider:
+  profile: personal
+  name: aws
+  ecr:
+    images:
+      compilerimg:
+        path: .
+  memorySize: 1024
+  timeout: 100
+  architecture: x86_64
+  httpApi:
+    cors:
+      allowedOrigins:
+        - "*"
+      allowedHeaders:
+        - Content-Type
+        - Authorization
+        - X-Amz-Date
+        - X-Api-Key
+        - X-Amz-Security-Token
+      allowedMethods:
+        - OPTIONS
+        - GET
+        - POST
+      allowCredentials: false
+
+package:
+  patterns:
+    - bin/**
+    - gcc/**
+    - handler.js
+    - "!**/*.md"
+
+functions:
+  compile:
+    image:
+      name: compilerimg
+    events:
+      - httpApi:
+          path: /compile
+          method: post
