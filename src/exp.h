@@ -164,12 +164,38 @@ class Block {
     int accept(Visitor* visitor);
 };
 
+class Param {
+   public:
+    string id;
+    string type;
+    Param(string i, string t);
+    ~Param();
+    int accept(Visitor* visitor);
+};
+
+class ParamList {
+   public:
+    list<Param*> param_list;
+    ParamList() {}
+    void add(Param* param) { param_list.push_back(param); };
+    ~ParamList();
+    int accept(Visitor* visitor);
+};
+
+class FCallExp : public Exp {
+   public:
+    string nombre;
+    list<Exp*> argumentos;
+    FCallExp(){};
+    ~FCallExp(){};
+    int accept(Visitor* visitor);
+};
+
 class FunDec {
    public:
     string id;
     string type;
-    list<string> param_list;
-    list<string> tipos;
+    ParamList* paramList;
     Block* block;
     FunDec(){};
     ~FunDec();
