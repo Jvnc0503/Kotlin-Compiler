@@ -9,7 +9,9 @@ void GenCodeVisitor::generar(Program* program) {
 }
 
 int GenCodeVisitor::visit(Program* program) {
-    out << ".data\nprint_fmt: .string \"%ld \\n\"" << endl;
+    out << ".data\n"
+        << "print_fmt:     .string \"%ld \"\n"
+        << "print_fmt_ln:  .string \"%ld \\n\"\n";
     program->vl->accept(this);
 
     for (auto& [var, _] : memoriaGlobal) {
@@ -136,8 +138,11 @@ int GenCodeVisitor::visit(AssignStatement* stm) {
 
 int GenCodeVisitor::visit(PrintStatement* stm) {
     stm->exp->accept(this);
+    string salto = (stm->type == "println") ? "print_fmt_ln" : "print_fmt";
     out << " movq %rax, %rsi\n"
-           " leaq print_fmt(%rip), %rdi\n"
+           " leaq "
+        << salto
+        << "(%rip), %rdi\n"
            " movl $0, %eax\n"
            " call printf@PLT\n";
     return 0;
