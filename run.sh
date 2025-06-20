@@ -17,13 +17,18 @@ fi
 cd src || { echo "No se encontró el directorio src/"; exit 1; }
 
 echo "Compilando programa C++..."
-g++ main.cpp exp.cpp parser.cpp scanner.cpp token.cpp visitor.cpp -o x
+g++ -std=c++20 \
+    main.cpp exp.cpp parser.cpp scanner.cpp token.cpp visitor.cpp \
+    printvisitor.cpp gencodevisitor.cpp \
+    -o x
+
 if [ $? -ne 0 ]; then
   echo "Fallo la compilación del programa."
   exit 1
 fi
-
-echo "Ejecutando parser con archivo de entrada: $INPUT_FILE"
+echo "Compilacion exitosa"
+echo " "
+echo "Ejecutando el archivo de entrada: $INPUT_FILE"
 ./x "../$INPUT_FILE"
 if [ $? -ne 0 ]; then
   echo "Fallo la ejecución del parser."
@@ -37,12 +42,13 @@ if [ ! -f "$ASM_FILE" ]; then
   exit 1
 fi
 
-echo "Compilando ensamblador con gcc..."
+echo " "
+echo "Compilando output.s con gcc..."
 gcc "$ASM_FILE" -o output_exec
 if [ $? -ne 0 ]; then
   echo "Fallo la compilación del ensamblador."
   exit 1
 fi
-
+echo " "
 echo "Ejecutando programa generado:"
 ./output_exec
