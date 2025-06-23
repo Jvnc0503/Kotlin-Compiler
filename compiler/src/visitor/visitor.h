@@ -118,7 +118,9 @@ class GenCodeVisitor : public Visitor {
     unordered_map<string, int> memoria;
     unordered_map<string, bool> memoriaGlobal;
     int offset = -8;
-    int labelcont = 0;
+    int whilelabelcont = 0;
+    int forlabelcont = 0;
+    int iflabelcont = 0;
     bool entornoFuncion = false;
     string nombreFuncion;
     int visit(BinaryExp* exp) override;

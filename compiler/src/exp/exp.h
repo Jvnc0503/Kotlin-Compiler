@@ -130,6 +130,7 @@ class ForStatement : public Stm {
    public:
     AssignStatement* begin;
     Exp* end;
+    AssignStatement* step;
     Block* block;
     ForStatement(){};
     int accept(Visitor* visitor);

@@ -167,7 +167,7 @@ int GenCodeVisitor::visit(Block* b) {
 }
 
 int GenCodeVisitor::visit(IfStatement* stm) {
-    int label = labelcont++;
+    int label = iflabelcont++;
     stm->condition->accept(this);
     out << " cmpq $0, %rax" << endl;
     out << " je else_" << label << endl;
@@ -181,7 +181,7 @@ int GenCodeVisitor::visit(IfStatement* stm) {
 }
 
 int GenCodeVisitor::visit(WhileStatement* stm) {
-    int label = labelcont++;
+    int label = whilelabelcont++;
     out << "while_" << label << ":" << endl;
     stm->condition->accept(this);
     out << " cmpq $0, %rax" << endl;
@@ -250,6 +250,16 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
 }
 
 int GenCodeVisitor::visit(ForStatement* stm) {
+    int label = forlabelcont++;
+    stm -> begin -> accept(this);
+    out << "for_" << label << ":" << endl;
+    stm -> end -> accept(this);
+    out << " cmpq $0, %rax" << endl;
+    out << " je endfor_" << label << endl;
+    stm -> block -> accept(this);
+    stm -> step -> accept(this);
+    out << " jmp for_" << label << endl;
+    out << " endfor_" << label <<  ":" << endl;
     return 0;
 }
 

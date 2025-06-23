@@ -129,6 +129,9 @@ ForStatement* Parser::handleForStatement() {
         errorHandler("RANGE", "FOR");
     }
     Exp* end = parseExpression();
+    IdentifierExp* id = new IdentifierExp(var);
+
+    Exp* condition = new BinaryExp(id, end, LE_OP);
     if (!match(Token::RPAREN)) {
         errorHandler("RPAREN", "FOR");
     }
@@ -142,8 +145,14 @@ ForStatement* Parser::handleForStatement() {
     consumeENDL();
     ForStatement* fstm = new ForStatement();
     fstm->begin = astm;
-    fstm->end = end;
+    fstm->end = condition;
     fstm->block = block;
+
+    NumberExp* number = new NumberExp(1);
+    BinaryExp* sum = new BinaryExp(id,number, PLUS_OP );
+    AssignStatement* step = new AssignStatement(var ,sum);
+
+    fstm -> step = step;
     return fstm;
 }
 

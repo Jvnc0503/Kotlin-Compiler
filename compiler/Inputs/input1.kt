@@ -1,4 +1,5 @@
 fun main() {
-    var x: Boolean = 1
+    for (x in 1 .. 5) {
     print(x)
+    }
 }
