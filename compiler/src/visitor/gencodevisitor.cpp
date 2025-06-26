@@ -27,11 +27,13 @@ int GenCodeVisitor::visit(Program* program) {
 int GenCodeVisitor::visit(VarDec* s) {
     if (!entornoFuncion) {
         memoriaGlobal[s->var] = true;
-    } else {
-        memoria[s->var] = offset;
-        offset -= 8;
+        s->stm->accept(this);
+        return 0;
     }
+    memoria[s->var] = offset;
+    offset -= 8;
     s->stm->accept(this);
+    out << " movq %rax, " << memoria[s->var] << "(%rbp)\n";
     return 0;
 }
 
@@ -220,12 +222,11 @@ int GenCodeVisitor::visit(FunDec* f) {
         offset -= 8;
     }
     f->block->vardecl->accept(this);
-    int reserva = -offset - 8;
-    if (reserva & 0xF)
-        reserva += 8;
-    if (reserva)
-        out << " subq $" << reserva << ", %rsp" << endl;
-
+    int reserva = (-offset);
+    reserva = (reserva + 15) & ~15;
+    if (reserva) {
+        out << " subq $" <<reserva << ", %rsp" << endl;
+    }
     f->block->stmdecl->accept(this);
     out << ".end_" << f->id << ":" << endl;
     out << "leave" << endl;
@@ -251,15 +252,15 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
 
 int GenCodeVisitor::visit(ForStatement* stm) {
     int label = forlabelcont++;
-    stm -> begin -> accept(this);
+    stm->begin->accept(this);
     out << "for_" << label << ":" << endl;
-    stm -> end -> accept(this);
+    stm->end->accept(this);
     out << " cmpq $0, %rax" << endl;
     out << " je endfor_" << label << endl;
-    stm -> block -> accept(this);
-    stm -> step -> accept(this);
+    stm->block->accept(this);
+    stm->step->accept(this);
     out << " jmp for_" << label << endl;
-    out << " endfor_" << label <<  ":" << endl;
+    out << " endfor_" << label << ":" << endl;
     return 0;
 }
 
@@ -268,5 +269,16 @@ int GenCodeVisitor::visit(ParamList* pl) {
 }
 
 int GenCodeVisitor::visit(Param* p) {
+    return 0;
+}
+
+int GenCodeVisitor::visit(FCallStm* stm) {
+    vector<std::string> argRegs = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    int size = stm->argumentos.size();
+    for (int i = 0; i < size; i++) {
+        stm->argumentos[i]->accept(this);
+        out << " mov %rax, " << argRegs[i] << endl;
+    }
+    out << "call " << stm->nombre << endl;
     return 0;
 }

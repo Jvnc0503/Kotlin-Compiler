@@ -1,5 +1,5 @@
-fun main() :Int {
-    var x: Int = 4
-    var y: Int = 2
-    print(x + y)
+fun main() {
+    var y = 2 + 4
+    var x = 4
+    print(y + x)
 }

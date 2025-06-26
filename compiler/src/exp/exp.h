@@ -193,6 +193,15 @@ class FCallExp : public Exp {
     int accept(Visitor* visitor);
 };
 
+class FCallStm : public Stm {
+   public:
+    string nombre;
+    vector<Exp*> argumentos;
+    FCallStm(){};
+    ~FCallStm(){};
+    int accept(Visitor* visitor);
+};
+
 class FunDec {
    public:
     string id;

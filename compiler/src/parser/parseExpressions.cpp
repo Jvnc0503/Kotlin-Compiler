@@ -101,8 +101,7 @@ Exp* Parser::parsePrimary() {
             FCallExp* fcall = new FCallExp();
             fcall->nombre = nombre;
             fcall->argumentos = parseArguments();
-            cout << current -> text << endl;
-            if (!match(Token:: RPAREN)) {
+            if (!match(Token::RPAREN)) {
                 errorHandler("RPAREN", "FCALL");
             }
             return fcall;
@@ -127,9 +126,9 @@ vector<Exp*> Parser::parseArguments() {
         return args;
 
     do {
-        Exp* e = parseExpression();   
+        Exp* e = parseExpression();
         args.push_back(e);
-    } while (match(Token::COMMA));    
+    } while (match(Token::COMMA));
 
-    return args;                      
+    return args;
 }

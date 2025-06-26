@@ -32,7 +32,8 @@ class Parser {
     PrintStatement* handlePrintStatement();
     ForStatement* handleForStatement();
     WhileStatement* handleWhileStatement();
-    AssignStatement* handleAssignStatement();
+    AssignStatement* handleAssignStatement(string nombre);
+    FCallStm* handleFCallStm(string nombre);
     VarDec* handleVarDecWithImplicitType(bool is_mut, string name);
     VarDec* handleVarDecWithExplicitType(bool is_mut, string name);
 

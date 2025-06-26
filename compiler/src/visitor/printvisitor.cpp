@@ -184,3 +184,17 @@ int PrintVisitor::visit(FCallExp* exp) {
     cout << ")" << endl;
     return 0;
 }
+
+int PrintVisitor::visit(FCallStm* stm) {
+    cout << stm->nombre << "( ";
+    bool first = true;
+    for (auto e : stm->argumentos) {
+        if (!first) {
+            std::cout << ", ";
+        }
+        e->accept(this);
+        first = false;
+    }
+    cout << ")" << endl;
+    return 0;
+}

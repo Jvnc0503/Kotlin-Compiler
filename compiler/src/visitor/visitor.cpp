@@ -87,3 +87,7 @@ int FCallExp::accept(Visitor* visitor) {
 int Program::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
+
+int FCallStm::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}

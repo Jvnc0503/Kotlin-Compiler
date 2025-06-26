@@ -30,7 +30,14 @@ Stm* Parser::parseStatement() {
     } else if (match(Token::PRINT) || match(Token::PRINTLN)) {
         return handlePrintStatement();
     } else if (match(Token::ID)) {
-        return handleAssignStatement();
+        string var = previous->text;
+        if (match(Token::LPAREN)) {
+            return handleFCallStm(var);
+        } else if (match(Token::ASSIGN)) {
+            return handleAssignStatement(var);
+        } else {
+            errorHandler("ASSIGN O LPAREN", "ID");
+        }
     } else if (match(Token::FOR)) {
         return handleForStatement();
     } else if (match(Token::WHILE)) {
@@ -40,9 +47,28 @@ Stm* Parser::parseStatement() {
         return new ReturnStatement(e);
     }
 
-    else {
-        return stm;
+    return stm;
+}
+
+FCallStm* Parser::handleFCallStm(string nombre) {
+    FCallStm* fc = new FCallStm();
+    vector<Exp*> lista;
+    if (match(Token::RPAREN)) {
+        fc->argumentos = lista;
+        fc->nombre = nombre;
+        return fc;
     }
+    lista.push_back(parseExpression());
+    while (match(Token::COMMA)) {
+        lista.push_back(parseExpression());
+    }
+    if (!match(Token::RPAREN)) {
+        cout << "Error: se esperaba un ')' después de la lista de argumentos." << endl;
+        exit(1);
+    }
+    fc->argumentos = lista;
+    fc->nombre = nombre;
+    return fc;
 }
 
 IfStatement* Parser::handleIfStatement() {
@@ -85,7 +111,6 @@ PrintStatement* Parser::handlePrintStatement() {
     }
     e = parseExpression();
     if (!match(Token::RPAREN)) {
-        cout << current->text << endl;
         errorHandler("RPAREN", "PRINT");
     }
     if (!match(Token::ENDL)) {
@@ -95,18 +120,14 @@ PrintStatement* Parser::handlePrintStatement() {
     return new PrintStatement(e, type);
 }
 
-AssignStatement* Parser::handleAssignStatement() {
-    string var = previous->text;
+AssignStatement* Parser::handleAssignStatement(string nombre) {
     Exp* e = nullptr;
-    if (!match(Token::ASSIGN)) {
-        errorHandler("ASSIGN", "STATEMENT");
-    }
     e = parseExpression();
     if (!match(Token::ENDL)) {
         errorHandler("ENDL", "ASSIGN");
     }
     consumeENDL();
-    return new AssignStatement(var, e);
+    return new AssignStatement(nombre, e);
 }
 
 ForStatement* Parser::handleForStatement() {
@@ -149,10 +170,10 @@ ForStatement* Parser::handleForStatement() {
     fstm->block = block;
 
     NumberExp* number = new NumberExp(1);
-    BinaryExp* sum = new BinaryExp(id,number, PLUS_OP );
-    AssignStatement* step = new AssignStatement(var ,sum);
+    BinaryExp* sum = new BinaryExp(id, number, PLUS_OP);
+    AssignStatement* step = new AssignStatement(var, sum);
 
-    fstm -> step = step;
+    fstm->step = step;
     return fstm;
 }
 

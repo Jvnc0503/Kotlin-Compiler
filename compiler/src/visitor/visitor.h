@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "environment.h"
 #include "exp/exp.h"
 
 class BinaryExp;
@@ -26,6 +27,7 @@ class WhileStatement;
 class ReturnStatement;
 class ParamList;
 class Param;
+class FCallStm;
 
 class Visitor {
    public:
@@ -50,6 +52,7 @@ class Visitor {
     virtual int visit(FunDecList* fl) = 0;
     virtual int visit(FCallExp* fcall) = 0;
     virtual int visit(Program* p) = 0;
+    virtual int visit(FCallStm* p) = 0;
 };
 
 class PrintVisitor : public Visitor {
@@ -76,34 +79,7 @@ class PrintVisitor : public Visitor {
     int visit(FunDecList* fl) override;
     int visit(FCallExp* fcall) override;
     int visit(Program* p) override;
-};
-
-class TypeCheckerVisitor : public Visitor {
-   public:
-    int revisar(Program* program);
-    std::vector<std::string> variables;
-    int cantidad = 0;
-    int visit(BinaryExp* exp) override;
-    int visit(NumberExp* exp) override;
-    int visit(UnaryExp* exp) override;
-    int visit(BoolExp* exp) override;
-    int visit(IdentifierExp* exp) override;
-    int visit(AssignStatement* stm) override;
-    int visit(PrintStatement* stm) override;
-    int visit(IfStatement* stm) override;
-    int visit(VarDec* stm) override;
-    int visit(VarDecList* stm) override;
-    int visit(StmtList*) override;
-    int visit(Block* b) override;
-    int visit(ForStatement* stm) override;
-    int visit(WhileStatement* stm) override;
-    int visit(ReturnStatement* stm) override;
-    int visit(ParamList* pl) override;
-    int visit(Param* p) override;
-    int visit(FunDec* f) override;
-    int visit(FunDecList* fl) override;
-    int visit(FCallExp* fcall) override;
-    int visit(Program* p) override;
+    int visit(FCallStm* p) override;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -144,6 +120,7 @@ class GenCodeVisitor : public Visitor {
     int visit(FunDecList* fl) override;
     int visit(FCallExp* fcall) override;
     int visit(Program* p) override;
+    int visit(FCallStm* p) override;
 };
 
 #endif  // VISITOR_H
