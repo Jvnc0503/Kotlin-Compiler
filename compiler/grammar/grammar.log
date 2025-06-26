@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.6.12)  19 JUN 2025 19:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2025.6.12)  25 JUN 2025 21:22
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -228,7 +228,7 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 Here is how much of TeX's memory you used:
  3432 strings out of 480247
  51526 string characters out of 5896151
- 383925 words of memory out of 5000000
+ 384925 words of memory out of 5000000
  21378 multiletter control sequences out of 15000+600000
  477134 words of font info for 44 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -239,9 +239,9 @@ m41k1/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1000.600pk> </home
 /m41k1/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk></usr/
 share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/t
 exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on grammar.pdf (1 page, 51567 bytes).
+Output written on grammar.pdf (1 page, 51053 bytes).
 PDF statistics:
- 135 PDF objects out of 1000 (max. 8388607)
+ 133 PDF objects out of 1000 (max. 8388607)
  22 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)

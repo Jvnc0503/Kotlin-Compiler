@@ -39,7 +39,8 @@
 % ClassDecl
 \textbf{ClassDec}
   \;&::=\; \textbf{class}\;\text{Identifier}
-     \;\textbf{\{}\;\text{\{VarDec\}}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\;\textbf{\}} \\[3pt]
+  \;\textbf{(}\;[\;\text{ParamList}\;]\;\textbf{)}
+     \;\textbf{\{}\;\text{VarDecList} \; \text{FunDecList}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\;\textbf{\}} \\[3pt]
 % ParamList
 \textbf{ParamList}
   \;&::=\; \text{Parameter} \; \{ \; \textbf{,} \; \text{Parameter} \;\} \\[3pt]
