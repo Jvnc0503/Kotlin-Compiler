@@ -25,8 +25,8 @@ int main(const int argc, const char* argv[]) {
     infile.close();
 
     Scanner scanner(input);
-    // scanner.test();
-    // scanner.reset();
+    scanner.test();
+    scanner.reset();
     cout << "Scanner exitoso" << endl;
     cout << endl;
     cout << "Iniciando parsing:" << endl;
