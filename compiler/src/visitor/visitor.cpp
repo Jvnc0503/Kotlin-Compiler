@@ -91,3 +91,15 @@ int Program::accept(Visitor* visitor) {
 int FCallStm::accept(Visitor* visitor) {
     return visitor->visit(this);
 }
+
+int ClassDec::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int ClassDecList::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
+
+int ClassAccessor::accept(Visitor* visitor) {
+    return visitor->visit(this);
+}
