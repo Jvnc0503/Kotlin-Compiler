@@ -34,8 +34,8 @@ int GenCodeVisitor::visit(VarDec* s) {
         } else {
             s->stm->accept(this);
             // out << " movq %rax, " << clases[nombreClase].off[s->var] << "(%rdi)" << endl;
-            // memoria[s->var] = offset;
-            // offset -= 8;
+            memoria[s->var] = offset;
+            offset -= 8;
         }
     } else {
         if (!entornoFuncion) {
@@ -148,7 +148,6 @@ int GenCodeVisitor::visit(FunDec* f) {
 
 int GenCodeVisitor::visit(IdentifierExp* exp) {
     if (entornoClase) {
-        cout << clases[nombreClase].off[exp->name] << endl;
         out << " movq " << clases[nombreClase].off[exp->name] << "(%rdi), %rax" << endl;
     } else {
         if (memoriaGlobal.count(exp->name))
@@ -345,6 +344,20 @@ int GenCodeVisitor::visit(FCallExp* exp) {
 }
 
 int GenCodeVisitor::visit(UnaryExp* exp) {
+    exp->exp->accept(this);
+
+    switch (exp->op) {
+        case NOT_OP:
+            out << "  cmpq  $0,  %rax\n"
+                   "  movl  $0,  %eax\n"
+                   "  sete  %al\n"
+                   "  movzbq %al, %rax\n";
+            break;
+
+        case NEG_OP:
+            out << "  negq  %rax\n";
+            break;
+    }
     return 0;
 }
 
@@ -389,7 +402,6 @@ int GenCodeVisitor::visit(NumberExp* exp) {
 int GenCodeVisitor::visit(ClassAccessor* ca) {
     int local_offset = memoria[ca->object];
     string nombreClase = tipoClase[ca->object];
-    cout << nombreClase << endl;
     int parameter_offset = clases[nombreClase].off[ca->parameter];
     out << " movq " << local_offset << "(%rbp),"
         << "%rax" << endl;

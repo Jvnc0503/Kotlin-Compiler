@@ -163,14 +163,17 @@ Param* Parser::parseParam() {
     }
 
     std::string type;
+
     if (match(Token::INT_TYPE)) {
         type = "Int";
     } else if (match(Token::BOOL_TYPE)) {
         type = "Boolean";
     } else if (match(Token::UNIT_TYPE)) {
         type = "Unit";
+    } else if (match(Token::ID)) {
+        type = previous->text;
     } else {
-        errorHandler("TYPE", "PARAM");
+        errorHandler("TYPE O ID", "PARAMLIST");
     }
 
     return new Param(id, type);
