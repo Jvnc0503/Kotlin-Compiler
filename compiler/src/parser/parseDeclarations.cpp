@@ -150,6 +150,9 @@ ParamList* Parser::parseParamList() {
     return pl;
 }
 Param* Parser::parseParam() {
+    if (check(Token::VAL)) {
+        advance();
+    }
     if (!match(Token::ID)) {
         return nullptr;
     }
@@ -171,4 +174,46 @@ Param* Parser::parseParam() {
     }
 
     return new Param(id, type);
+}
+
+ClassDecList* Parser::parseClassDecList() {
+    consumeENDL();
+    ClassDecList* cdl = new ClassDecList();
+
+    ClassDec* aux = parseClassDec();
+    while (aux) {
+        cdl->add(aux);
+        consumeENDL();
+        aux = parseClassDec();
+    }
+    return cdl;
+}
+
+ClassDec* Parser::parseClassDec() {
+    consumeENDL();
+    if (!match(Token::CLASS)) {
+        return nullptr;
+    }
+    ClassDec* cd = new ClassDec();
+    if (!match(Token::ID)) {
+        errorHandler("ID", "CLASSDEC");
+    }
+    cd->id = previous->text;
+    if (!match(Token::LPAREN)) {
+        errorHandler("LPAREN", "CLASSDECS");
+    }
+    ParamList* pl = parseParamList();
+    if (!match(Token::RPAREN)) {
+        errorHandler("RPAREN", "CLASSDECS");
+    }
+    if (!match(Token::LBRACE)) {
+        errorHandler("LBRACE", "CLASSDEC");
+    }
+    VarDecList* vdl = parseVarDecList();
+    if (!match(Token::RBRACE)) {
+        errorHandler("RBRACE", "CLASSDEC");
+    }
+    cd->pl = pl;
+    cd->vdl = vdl;
+    return cd;
 }
