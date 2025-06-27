@@ -66,6 +66,8 @@ Program* Parser::parseProgram() {
     Program* p = new Program();
     p->vl = parseVarDecList();
     consumeENDL();
+    p->cl = parseClassDecList();
+    consumeENDL();
     p->fl = parseFunDecList();
     consumeENDL();
     return p;
