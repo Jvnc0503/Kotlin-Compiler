@@ -100,11 +100,20 @@ Exp* Parser::parsePrimary() {
         if (match(Token::LPAREN)) {
             FCallExp* fcall = new FCallExp();
             fcall->nombre = nombre;
+            isupper(nombre[0]) ? fcall->is_class = true : fcall->is_class = false;
             fcall->argumentos = parseArguments();
             if (!match(Token::RPAREN)) {
                 errorHandler("RPAREN", "FCALL");
             }
             return fcall;
+        } else if (match(Token::DOT)) {
+            ClassAccessor* ca = new ClassAccessor();
+            if (!match(Token::ID)) {
+                errorHandler("ID", "CLASS_ACCESSOR");
+            }
+            ca->object = nombre;
+            ca->parameter = previous->text;
+            return ca;
         } else {
             return new IdentifierExp(nombre);
         }
