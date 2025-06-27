@@ -184,10 +184,20 @@ class ParamList {
     int accept(Visitor* visitor);
 };
 
+class ClassAccessor : public Exp {
+   public:
+    string object;
+    string parameter;
+    ClassAccessor(){};
+    ~ClassAccessor(){};
+    int accept(Visitor* visitor);
+};
+
 class FCallExp : public Exp {
    public:
     string nombre;
     vector<Exp*> argumentos;
+    bool is_class;
     FCallExp(){};
     ~FCallExp(){};
     int accept(Visitor* visitor);
@@ -246,7 +256,9 @@ class VarDecList {
 class ClassDec {
    public:
     string id;
-    list<VarDec*> vardecs;
+    VarDecList* vdl;
+    ParamList* pl;
+
     ClassDec(){};
     ~ClassDec();
     int accept(Visitor* visitor);
@@ -255,6 +267,7 @@ class ClassDec {
 class ClassDecList {
    public:
     list<ClassDec*> classdecs;
+    void add(ClassDec* cd) { classdecs.push_back(cd); }
     ClassDecList(){};
     ~ClassDecList();
     int accept(Visitor* visitor);

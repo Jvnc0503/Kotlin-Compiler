@@ -138,9 +138,8 @@ string Exp::binopToString(BinaryOp op) {
 }
 
 ClassDec::~ClassDec() {
-    for (auto v : vardecs) {
-        delete v;
-    }
+    delete pl;
+    delete vdl;
 }
 
 ClassDecList::~ClassDecList() {
