@@ -1,5 +1,3 @@
 fun main() {
-    for (x in 1 .. 5) {
-    print(x)
-    }
+    print((2 + 3)*2)
 }
