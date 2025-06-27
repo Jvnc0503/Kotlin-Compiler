@@ -78,10 +78,13 @@ int PrintVisitor::visit(ForStatement* stm) {
 }
 
 int PrintVisitor::imprimir(Program* program) {
+    if (program->cl)
+        program->cl->accept(this);
     if (program->vl)
         program->vl->accept(this);
     if (program->fl)
         program->fl->accept(this);
+
     return 0;
 }
 int PrintVisitor::visit(VarDec* s) {
@@ -196,5 +199,26 @@ int PrintVisitor::visit(FCallStm* stm) {
         first = false;
     }
     cout << ")" << endl;
+    return 0;
+}
+
+int PrintVisitor::visit(ClassDec* cd) {
+    cout << "class " << cd->id << "(";
+    cd->pl->accept(this);
+    cout << ") {" << endl;
+    cd->vdl->accept(this);
+    cout << "}" << endl;
+    return 0;
+}
+
+int PrintVisitor::visit(ClassDecList* cdl) {
+    for (auto cd : cdl->classdecs) {
+        cd->accept(this);
+    }
+    return 0;
+}
+
+int PrintVisitor::visit(ClassAccessor* ca) {
+    cout << ca->object << "." << ca->parameter;
     return 0;
 }
