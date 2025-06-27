@@ -135,7 +135,7 @@ int GenCodeVisitor::visit(FunDec* f) {
     int reserva = (-offset);
     reserva = (reserva + 15) & ~15;
     if (reserva) {
-        out << " subq $" <<reserva << ", %rsp" << endl;
+        out << " subq $" << reserva << ", %rsp" << endl;
     }
     f->block->stmdecl->accept(this);
 
