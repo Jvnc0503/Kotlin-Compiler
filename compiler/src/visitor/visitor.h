@@ -28,6 +28,7 @@ class ReturnStatement;
 class ParamList;
 class Param;
 class FCallStm;
+class ClassAccessor;
 
 class Visitor {
    public:
@@ -53,6 +54,9 @@ class Visitor {
     virtual int visit(FCallExp* fcall) = 0;
     virtual int visit(Program* p) = 0;
     virtual int visit(FCallStm* p) = 0;
+    virtual int visit(ClassDec* p) = 0;
+    virtual int visit(ClassDecList* p) = 0;
+    virtual int visit(ClassAccessor* p) = 0;
 };
 
 class PrintVisitor : public Visitor {
@@ -80,6 +84,14 @@ class PrintVisitor : public Visitor {
     int visit(FCallExp* fcall) override;
     int visit(Program* p) override;
     int visit(FCallStm* p) override;
+    int visit(ClassDec* p) override;
+    int visit(ClassDecList* p) override;
+    int visit(ClassAccessor* ca) override;
+};
+
+struct ClassInfo {
+    int size;
+    unordered_map<string, int> off;
 };
 
 class GenCodeVisitor : public Visitor {
@@ -93,12 +105,16 @@ class GenCodeVisitor : public Visitor {
     void generar(Program* program);
     unordered_map<string, int> memoria;
     unordered_map<string, bool> memoriaGlobal;
+    unordered_map<string, ClassInfo> clases;
+    unordered_map<string, string> tipoClase;
     int offset = -8;
     int whilelabelcont = 0;
     int forlabelcont = 0;
     int iflabelcont = 0;
+    bool entornoClase = false;
     bool entornoFuncion = false;
     string nombreFuncion;
+    string nombreClase;
     int visit(BinaryExp* exp) override;
     int visit(UnaryExp* exp) override;
     int visit(NumberExp* exp) override;
@@ -121,6 +137,9 @@ class GenCodeVisitor : public Visitor {
     int visit(FCallExp* fcall) override;
     int visit(Program* p) override;
     int visit(FCallStm* p) override;
+    int visit(ClassDecList* p) override;
+    int visit(ClassDec* p) override;
+    int visit(ClassAccessor* ca) override;
 };
 
 #endif  // VISITOR_H
