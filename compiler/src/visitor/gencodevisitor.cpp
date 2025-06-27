@@ -19,21 +19,52 @@ int GenCodeVisitor::visit(Program* program) {
     }
 
     out << ".text\n";
-    program->fl->accept(this);
+    if (program->cl)
+        program->cl->accept(this);
+    if (program->fl)
+        program->fl->accept(this);
     out << ".section .note.GNU-stack,\"\",@progbits" << endl;
     return 0;
 }
 
 int GenCodeVisitor::visit(VarDec* s) {
-    if (!entornoFuncion) {
-        memoriaGlobal[s->var] = true;
-        s->stm->accept(this);
-        return 0;
+    if (entornoClase) {
+        if (!s->stm) {
+            out << " movq $0, " << clases[nombreClase].off[s->var] << "(%rdi)" << endl;
+        } else {
+            s->stm->accept(this);
+            // out << " movq %rax, " << clases[nombreClase].off[s->var] << "(%rdi)" << endl;
+            // memoria[s->var] = offset;
+            // offset -= 8;
+        }
+    } else {
+        if (!entornoFuncion) {
+            memoriaGlobal[s->var] = true;
+
+            if (s->stm) {
+                s->stm->accept(this);
+                out << " movq %rax, " << s->var << "(%rip)\n";
+            }
+            return 0;
+        }
+        out << " subq $8, %rsp\n";
+
+        memoria[s->var] = offset;
+        offset -= 8;
+
+        if (s->stm) {
+            s->stm->accept(this);
+            // out << " movq %rax, " << memoria[s->var] << "(%rbp)\n";
+            if (auto fcall = dynamic_cast<FCallExp*>(s->stm->rhs)) {
+                if (fcall->is_class) {
+                    tipoClase[s->var] = fcall->nombre;
+                }
+            }
+        } else {
+            out << " movq $0, " << memoria[s->var] << "(%rbp)\n";
+        }
     }
-    memoria[s->var] = offset;
-    offset -= 8;
-    s->stm->accept(this);
-    out << " movq %rax, " << memoria[s->var] << "(%rbp)\n";
+
     return 0;
 }
 
@@ -43,16 +74,88 @@ int GenCodeVisitor::visit(VarDecList* stm) {
     return 0;
 }
 
-int GenCodeVisitor::visit(NumberExp* exp) {
-    out << " movq $" << exp->value << ", %rax" << endl;
+int GenCodeVisitor::visit(ClassDec* cd) {
+    entornoClase = true;
+    nombreClase = cd->id;
+
+    int local_offset = 0;
+    ClassInfo info;
+    vector<std::string> argRegs = {"%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+
+    out << ".globl " << cd->id << "$ctor\n";
+    out << cd->id << "$ctor:\n";
+
+    int i = 0;
+    for (auto p : cd->pl->param_list) {
+        info.off[p->id] = local_offset;
+        out << " movq " << argRegs[i] << ", " << local_offset << "(%rdi)" << endl;
+        local_offset += 8;
+        i++;
+    }
+
+    for (auto v : cd->vdl->vardecs) {
+        info.off[v->var] = local_offset;
+        local_offset += 8;
+    }
+
+    info.size = local_offset;
+    clases[cd->id] = info;
+
+    cd->vdl->accept(this);
+    out << "ret" << endl;
+    entornoClase = false;
+    return 0;
+}
+
+int GenCodeVisitor::visit(ClassDecList* cdl) {
+    for (auto cd : cdl->classdecs) {
+        cd->accept(this);
+    }
+    return 0;
+}
+
+int GenCodeVisitor::visit(FunDec* f) {
+    entornoFuncion = true;
+    memoria.clear();
+    offset = -8;
+    nombreFuncion = f->id;
+    vector<std::string> argRegs = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    out << ".globl " << f->id << endl;
+    out << f->id << ":" << endl;
+    out << " pushq %rbp" << endl;
+    out << " movq %rsp, %rbp" << endl;
+    int size = f->paramList->param_list.size();
+    for (int i = 0; i < size; i++) {
+        memoria[f->paramList->param_list[i]->id] = offset;
+        out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
+        offset -= 8;
+    }
+
+    f->block->vardecl->accept(this);
+    int reserva = (-offset);
+    reserva = (reserva + 15) & ~15;
+    if (reserva) {
+        out << " subq $" <<reserva << ", %rsp" << endl;
+    }
+    f->block->stmdecl->accept(this);
+
+    out << ".end_" << f->id << ":" << endl;
+    out << "leave" << endl;
+    out << "ret" << endl;
+    entornoFuncion = false;
     return 0;
 }
 
 int GenCodeVisitor::visit(IdentifierExp* exp) {
-    if (memoriaGlobal.count(exp->name))
-        out << " movq " << exp->name << "(%rip), %rax" << endl;
-    else
-        out << " movq " << memoria[exp->name] << "(%rbp), %rax" << endl;
+    if (entornoClase) {
+        cout << clases[nombreClase].off[exp->name] << endl;
+        out << " movq " << clases[nombreClase].off[exp->name] << "(%rdi), %rax" << endl;
+    } else {
+        if (memoriaGlobal.count(exp->name))
+            out << " movq " << exp->name << "(%rip), %rax" << endl;
+        else
+            out << " movq " << memoria[exp->name] << "(%rbp), %rax" << endl;
+    }
     return 0;
 }
 
@@ -128,25 +231,33 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
     }
     return 0;
 }
-
 int GenCodeVisitor::visit(AssignStatement* stm) {
     stm->rhs->accept(this);
-    if (memoriaGlobal.count(stm->id))
-        out << " movq %rax, " << stm->id << "(%rip)" << endl;
-    else
-        out << " movq %rax, " << memoria[stm->id] << "(%rbp)" << endl;
+
+    if (entornoClase) {
+        int off = clases[nombreClase].off[stm->id];
+        out << " movq %rax, " << off << "(%rdi)\n";
+    } else if (memoriaGlobal.count(stm->id)) {
+        out << " movq %rax, " << stm->id << "(%rip)\n";
+    } else {
+        out << " movq %rax, " << memoria[stm->id] << "(%rbp)\n";
+    }
     return 0;
 }
 
 int GenCodeVisitor::visit(PrintStatement* stm) {
     stm->exp->accept(this);
-    string salto = (stm->type == "println") ? "print_fmt_ln" : "print_fmt";
-    out << " movq %rax, %rsi\n"
-           " leaq "
-        << salto
-        << "(%rip), %rdi\n"
-           " movl $0, %eax\n"
-           " call printf@PLT\n";
+    std::string fmt = (stm->type == "println") ? "print_fmt_ln" : "print_fmt";
+
+    out << " movq %rsp, %rbx\n"
+        << " andq $15, %rbx\n"
+        << " subq %rbx, %rsp\n"
+        << " movq %rax, %rsi\n"
+        << " leaq " << fmt << "(%rip), %rdi\n"
+        << " xor  %eax, %eax\n"
+        << " call printf@PLT\n"
+        << " addq %rbx, %rsp\n";
+
     return 0;
 }
 
@@ -205,44 +316,31 @@ int GenCodeVisitor::visit(ReturnStatement* stm) {
     return 0;
 }
 
-int GenCodeVisitor::visit(FunDec* f) {
-    entornoFuncion = true;
-    memoria.clear();
-    offset = -8;
-    nombreFuncion = f->id;
-    vector<std::string> argRegs = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-    out << ".globl " << f->id << endl;
-    out << f->id << ":" << endl;
-    out << " pushq %rbp" << endl;
-    out << " movq %rsp, %rbp" << endl;
-    int size = f->paramList->param_list.size();
-    for (int i = 0; i < size; i++) {
-        memoria[f->paramList->param_list[i]->id] = offset;
-        out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
-        offset -= 8;
-    }
-    f->block->vardecl->accept(this);
-    int reserva = (-offset);
-    reserva = (reserva + 15) & ~15;
-    if (reserva) {
-        out << " subq $" <<reserva << ", %rsp" << endl;
-    }
-    f->block->stmdecl->accept(this);
-    out << ".end_" << f->id << ":" << endl;
-    out << "leave" << endl;
-    out << "ret" << endl;
-    entornoFuncion = false;
-    return 0;
-}
-
 int GenCodeVisitor::visit(FCallExp* exp) {
-    vector<std::string> argRegs = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
-    int size = exp->argumentos.size();
-    for (int i = 0; i < size; i++) {
-        exp->argumentos[i]->accept(this);
-        out << " mov %rax, " << argRegs[i] << endl;
+    if (exp->is_class) {
+        vector<std::string> argRegs = {"%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+        int size = clases[exp->nombre].size;
+        out << " subq $" << size << ", %rsp" << endl;
+        out << " leaq 0(%rsp), %rdi" << endl;
+        size = exp->argumentos.size();
+        for (int i = 0; i < size; i++) {
+            exp->argumentos[i]->accept(this);
+            out << " mov %rax, " << argRegs[i] << endl;
+        }
+        out << "call " << exp->nombre << "$ctor" << endl;
+        out << " movq %rdi,"
+            << "%rax" << endl;
+        offset -= 8;
+    } else {
+        vector<std::string> argRegs = {"%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+        int size = exp->argumentos.size();
+        for (int i = 0; i < size; i++) {
+            exp->argumentos[i]->accept(this);
+            out << " mov %rax, " << argRegs[i] << endl;
+        }
+        out << "call " << exp->nombre << endl;
     }
-    out << "call " << exp->nombre << endl;
+
     return 0;
 }
 
@@ -280,5 +378,21 @@ int GenCodeVisitor::visit(FCallStm* stm) {
         out << " mov %rax, " << argRegs[i] << endl;
     }
     out << "call " << stm->nombre << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(NumberExp* exp) {
+    out << " movq $" << exp->value << ", %rax" << endl;
+    return 0;
+}
+
+int GenCodeVisitor::visit(ClassAccessor* ca) {
+    int local_offset = memoria[ca->object];
+    string nombreClase = tipoClase[ca->object];
+    cout << nombreClase << endl;
+    int parameter_offset = clases[nombreClase].off[ca->parameter];
+    out << " movq " << local_offset << "(%rbp),"
+        << "%rax" << endl;
+    out << " movq " << parameter_offset << "(%rax), %rax" << endl;
     return 0;
 }
