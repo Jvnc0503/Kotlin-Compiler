@@ -49,7 +49,6 @@ std::string Token::typeToString(const Type& type) {
                                                                 {VAL, "VAL"},
                                                                 {FUN, "FUN"},
                                                                 {CLASS, "CLASS"},
-                                                                {THIS, "THIS"},
                                                                 {INT_TYPE, "INT_TYPE"},
                                                                 {BOOL_TYPE, "BOOL_TYPE"},
                                                                 {UNIT_TYPE, "UNIT_TYPE"},

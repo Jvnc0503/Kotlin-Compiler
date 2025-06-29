@@ -55,9 +55,6 @@ struct Token {
         FUN,
         CLASS,
 
-        // References
-        THIS,
-
         // Types
         INT_TYPE,
         BOOL_TYPE,

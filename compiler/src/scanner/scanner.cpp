@@ -22,7 +22,7 @@ void Scanner::reset() {
 
 static std::unordered_map<std::string, Token::Type> keywords = {
     {"var", Token::VAR}, {"val", Token::VAL}, {"fun", Token::FUN}, {"class", Token::CLASS}, {"if", Token::IF}, {"else", Token::ELSE}, {"while", Token::WHILE},
-    {"for", Token::FOR}, {"break", Token::BREAK}, {"continue", Token::CONTINUE}, {"return", Token::RETURN}, {"in", Token::IN}, {"this", Token::THIS}, {"Int", Token::INT_TYPE},
+    {"for", Token::FOR}, {"break", Token::BREAK}, {"continue", Token::CONTINUE}, {"return", Token::RETURN}, {"in", Token::IN}, {"Int", Token::INT_TYPE},
     {"Boolean", Token::BOOL_TYPE}, {"Unit", Token::UNIT_TYPE}, {"true", Token::TRUE}, {"false", Token::FALSE}, {"print", Token::PRINT}, {"println", Token::PRINTLN},
 };
 
