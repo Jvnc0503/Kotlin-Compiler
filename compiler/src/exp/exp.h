@@ -77,7 +77,7 @@ public:
 class IdentifierExp final : public Exp {
 public:
     std::string name;
-    explicit IdentifierExp(const std::string& n);
+    explicit IdentifierExp(std::string n);
     int accept(Visitor* visitor) override;
     ~IdentifierExp() override;
 };
@@ -269,8 +269,9 @@ public:
     bool is_implicit;
     AssignStatement* stm;
 
-    VarDec(): is_mut(false), is_implicit(false), stm(nullptr) {
-    }
+    VarDec(bool is_mut, string var, bool is_implicit, AssignStatement* stm);
+
+    VarDec(bool is_mut, string type, string var, bool is_implicit, AssignStatement* stm);
 
     int accept(Visitor* visitor);
     ~VarDec();

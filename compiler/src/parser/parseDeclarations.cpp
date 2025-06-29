@@ -1,3 +1,5 @@
+#include <unordered_map>
+
 #include "parser.h"
 #include "../exp/exp.h"
 #include "../scanner/token.h"
@@ -5,11 +7,10 @@
 VarDecList* Parser::parseVarDecList() {
     consumeENDL();
     auto* vdl = new VarDecList();
-    VarDec* aux = parseVarDec();
-    while (aux) {
+    VarDec* aux;
+    while ((aux = parseVarDec())) {
         vdl->add(aux);
         consumeENDL();
-        aux = parseVarDec();
     }
     return vdl;
 }
@@ -19,62 +20,47 @@ VarDec* Parser::parseVarDec() {
     if (!(check(Token::VAL) || check(Token::VAR))) {
         return nullptr;
     }
-    bool is_mut;
-    string name;
-    if (match(Token::VAL)) {
-        is_mut = false;
-    } else if (match(Token::VAR)) {
-        is_mut = true;
+    if (!(match(Token::VAR) || match(Token::VAL))) {
+        errorHandler("VAR | VAL", "VarDec");
     }
+    const bool is_mut = previous->type == Token::VAR;
     if (!match(Token::ID)) {
         errorHandler("ID", "VarDec");
     }
-    name = previous->text;
+    const string name = previous->text;
     if (match(Token::COLON)) {
         return handleVarDecWithExplicitType(is_mut, name);
     }
     return handleVarDecWithImplicitType(is_mut, name);
 }
 
-VarDec* Parser::handleVarDecWithImplicitType(bool is_mut, string name) {
-    auto* vd = new VarDec();
-    vd->is_mut = is_mut;
-    vd->var = name;
-    vd->is_implicit = true;
+VarDec* Parser::handleVarDecWithImplicitType(const bool is_mut, const string& name) {
     if (!match(Token::ASSIGN)) {
-        errorHandler("ASSIGN", "VARDEC");
+        errorHandler("ASSIGN", "VarDec");
     }
     Exp* e = parseExpression();
-    auto* astm = new AssignStatement(name, e);
-    vd->stm = astm;
-    return vd;
+    auto* stm = new AssignStatement(name, e);
+    return new VarDec(is_mut, name, true, stm);
 }
 
-VarDec* Parser::handleVarDecWithExplicitType(bool is_mut, string name) {
-    auto* vd = new VarDec();
-    vd->is_mut = is_mut;
-    vd->var = name;
-    vd->is_implicit = false;
-    if (match(Token::BOOL_TYPE)) {
-        vd->type = "Boolean";
-    } else if (match(Token::INT_TYPE)) {
-        vd->type = "Int";
-    } else if (match(Token::UNIT_TYPE)) {
-        vd->type = "Unit";
-    } else {
-        cout << "Error: se esperaba un tipo válido después de ':'" << endl;
+static std::unordered_map<Token::Type, std::string> typeMap = {{Token::BOOL_TYPE, "Boolean"}, {Token::INT_TYPE, "Int"}, {Token::UNIT_TYPE, "Unit"}};
+
+VarDec* Parser::handleVarDecWithExplicitType(const bool is_mut, const string& name) {
+    if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE))) {
+        cout << "Error: se esperaba un tipo válido después de ':'\n";
         exit(1);
     }
+    const std::string type = typeMap[previous->type];
+    AssignStatement* stm = nullptr;
     if (match(Token::ASSIGN)) {
         Exp* e = parseExpression();
-        AssignStatement* stm = new AssignStatement(name, e);
-        vd->stm = stm;
+        stm = new AssignStatement(name, e);
     }
-    if (!match(Token::ENDL)) {
-        errorHandler("ENDL", "VarDec");
+    if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
+        errorHandler("ENDL | SEMICOLON", "VarDec");
     }
     consumeENDL();
-    return vd;
+    return new VarDec(is_mut, name, type, false, stm);
 }
 
 FunDecList* Parser::parseFunDecList() {

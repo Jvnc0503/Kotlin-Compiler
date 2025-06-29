@@ -7,12 +7,11 @@
 
 class Parser {
     Scanner* scanner;
-    Token *current, *previous;
-    bool match(Token::Type ttype);
+    Token *previous, *current;
+    bool isAtEnd() const;
     bool check(Token::Type ttype) const;
     bool advance();
-    bool isAtEnd() const;
-    list<Stm*> parseStmList();
+    bool match(Token::Type ttype);
     Exp* parseExpression();
     Exp* parseLogicAnd();
     Exp* parseEquality();
@@ -35,8 +34,8 @@ class Parser {
     WhileStatement* handleWhileStatement();
     AssignStatement* handleAssignStatement(const string& nombre);
     FCallStm* handleFCallStm(string nombre);
-    VarDec* handleVarDecWithImplicitType(bool is_mut, string name);
-    VarDec* handleVarDecWithExplicitType(bool is_mut, string name);
+    VarDec* handleVarDecWithImplicitType(bool is_mut, const string& name);
+    VarDec* handleVarDecWithExplicitType(bool is_mut, const string& name);
 
 public:
     explicit Parser(Scanner* scanner);

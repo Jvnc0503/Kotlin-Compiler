@@ -1,7 +1,8 @@
 #include "exp.h"
 #include <iostream>
+#include <utility>
 
-BinaryExp::BinaryExp(Exp* l, Exp* r, BinaryOp op) : left(l), right(r), op(op) {
+BinaryExp::BinaryExp(Exp* l, Exp* r, const BinaryOp op) : left(l), right(r), op(op) {
     if (op == PLUS_OP || op == MINUS_OP || op == MUL_OP || op == DIV_OP) {
         type = "int";
     } else {
@@ -9,17 +10,16 @@ BinaryExp::BinaryExp(Exp* l, Exp* r, BinaryOp op) : left(l), right(r), op(op) {
     }
 }
 
-NumberExp::NumberExp(int v) : value(v) {
+NumberExp::NumberExp(const int v) : value(v) {
 }
 
-BoolExp::BoolExp(bool v) : value(v) {
+BoolExp::BoolExp(const bool v) : value(v) {
 }
 
-IdentifierExp::IdentifierExp(const string& n) : name(n) {
+IdentifierExp::IdentifierExp(string n) : name(std::move(n)) {
 }
 
-Exp::~Exp() {
-}
+Exp::~Exp() = default;
 
 BinaryExp::~BinaryExp() {
     delete left;
@@ -32,7 +32,7 @@ BoolExp::~BoolExp() = default;
 
 IdentifierExp::~IdentifierExp() = default;
 
-UnaryExp::UnaryExp(Exp* e, UnaryOp o) : exp(e), op(o) {
+UnaryExp::UnaryExp(Exp* e, const UnaryOp op) : exp(e), op(op) {
 };
 
 UnaryExp::~UnaryExp() {
@@ -94,6 +94,13 @@ WhileStatement::~WhileStatement() {
     delete block;
 }
 
+VarDec::VarDec(const bool is_mut, string var, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), var(std::move(var)), is_implicit(is_implicit), stm(stm) {
+}
+
+VarDec::VarDec(const bool is_mut, string type, string var, const bool is_implicit, AssignStatement* stm): is_mut(is_mut), type(std::move(type)), var(std::move(var)), is_implicit(is_implicit),
+                                                                                                          stm(stm) {
+}
+
 VarDec::~VarDec() {
     delete stm;
 }
@@ -109,7 +116,7 @@ void VarDecList::add(VarDec* vardec) {
 }
 
 StmtList::~StmtList() {
-    for (auto s : stm_list) {
+    for (const auto& s : stm_list) {
         delete s;
     }
 }
@@ -165,7 +172,7 @@ ClassDec::~ClassDec() {
 }
 
 ClassDecList::~ClassDecList() {
-    for (auto c : classdecs) {
+    for (const auto& c : classdecs) {
         delete c;
     }
 }

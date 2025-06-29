@@ -1,3 +1,7 @@
+# ---------------------------- General
+.idea
+cmake-build-debug
+
 # ---------------------------- compiler
 compiler/cmake-build-debug
 compiler/src/cmake-build-debug

@@ -4,12 +4,8 @@
 #include "../scanner/scanner.h"
 #include "../scanner/token.h"
 
-bool Parser::match(const Token::Type ttype) {
-    if (check(ttype)) {
-        advance();
-        return true;
-    }
-    return false;
+bool Parser::isAtEnd() const {
+    return current->type == Token::ENDOFFILE;
 }
 
 bool Parser::check(const Token::Type ttype) const {
@@ -34,19 +30,20 @@ bool Parser::advance() {
     return false;
 }
 
-bool Parser::isAtEnd() const {
-    return current->type == Token::ENDOFFILE;
+bool Parser::match(const Token::Type ttype) {
+    if (check(ttype)) {
+        advance();
+        return true;
+    }
+    return false;
 }
 
 void Parser::consumeENDL() {
-    while (check(Token::ENDL)) {
-        advance();
+    while (match(Token::ENDL)) {
     }
 }
 
-Parser::Parser(Scanner* scanner) : scanner(scanner) {
-    previous = nullptr;
-    current = scanner->nextToken();
+Parser::Parser(Scanner* scanner) : scanner(scanner), previous(nullptr), current(scanner->nextToken()) {
     if (current->type == Token::ERROR) {
         std::cerr << "Error en el primer token: " << current->text << '\n';
         exit(1);
