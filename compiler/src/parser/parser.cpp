@@ -1,48 +1,40 @@
 #include "parser.h"
 #include <iostream>
-#include <stdexcept>
-#include "exp/exp.h"
-#include "scanner/scanner.h"
-#include "scanner/token.h"
+#include "../exp/exp.h"
+#include "../scanner/scanner.h"
+#include "../scanner/token.h"
 
-using namespace std;
-
-bool Parser::match(Token::Type ttype) {
+bool Parser::match(const Token::Type ttype) {
     if (check(ttype)) {
         advance();
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
-bool Parser::check(Token::Type ttype) {
+bool Parser::check(const Token::Type ttype) const {
     if (isAtEnd()) {
         return false;
-    } else {
-        return current->type == ttype;
     }
+    return current->type == ttype;
 }
 
 bool Parser::advance() {
     if (!isAtEnd()) {
         Token* temp = current;
-        if (previous) {
-            delete previous;
-        }
+        delete previous;
         current = scanner->nextToken();
         previous = temp;
         if (check(Token::ERROR)) {
-            cout << "Error de análisis, carácter no reconocido: " << current->text << endl;
+            std::cerr << "Error de análisis, carácter no reconocido: " << current->text << '\n';
             exit(1);
         }
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
-bool Parser::isAtEnd() {
+bool Parser::isAtEnd() const {
     return current->type == Token::ENDOFFILE;
 }
 
@@ -52,18 +44,18 @@ void Parser::consumeENDL() {
     }
 }
 
-Parser::Parser(Scanner* sc) : scanner(sc) {
+Parser::Parser(Scanner* scanner) : scanner(scanner) {
     previous = nullptr;
     current = scanner->nextToken();
     if (current->type == Token::ERROR) {
-        cout << "Error en el primer token: " << current->text << endl;
+        std::cerr << "Error en el primer token: " << current->text << '\n';
         exit(1);
     }
 }
 
 Program* Parser::parseProgram() {
     consumeENDL();
-    Program* p = new Program();
+    auto* p = new Program();
     p->vl = parseVarDecList();
     consumeENDL();
     p->cl = parseClassDecList();

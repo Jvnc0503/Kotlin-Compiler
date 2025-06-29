@@ -1,6 +1,6 @@
 #include <iostream>
 #include <unordered_map>
-#include "exp/exp.h"
+#include "../exp/exp.h"
 #include "visitor.h"
 using namespace std;
 
@@ -80,7 +80,7 @@ int GenCodeVisitor::visit(ClassDec* cd) {
 
     int local_offset = 0;
     ClassInfo info;
-    vector<std::string> argRegs = {"%rsi", "%rdx", "%rcx", "%r8", "%r9"};
+    static const vector<std::string> argRegs = {"%rsi", "%rdx", "%rcx", "%r8", "%r9"};
 
     out << ".globl " << cd->id << "$ctor\n";
     out << cd->id << "$ctor:\n";
@@ -150,7 +150,7 @@ int GenCodeVisitor::visit(IdentifierExp* exp) {
     if (entornoClase) {
         out << " movq " << clases[nombreClase].off[exp->name] << "(%rdi), %rax" << endl;
     } else {
-        if (memoriaGlobal.count(exp->name))
+        if (memoriaGlobal.contains(exp->name))
             out << " movq " << exp->name << "(%rip), %rax" << endl;
         else
             out << " movq " << memoria[exp->name] << "(%rbp), %rax" << endl;
@@ -175,68 +175,69 @@ int GenCodeVisitor::visit(BinaryExp* exp) {
             break;
         case DIV_OP:
             out << " cqto\n"
-                   " idivq %rcx\n";
+                " idivq %rcx\n";
             break;
         case LT_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " setl %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " setl %al\n"
+                " movzbq %al, %rax\n";
             break;
         case LE_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " setle %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " setle %al\n"
+                " movzbq %al, %rax\n";
             break;
         case GT_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " setg %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " setg %al\n"
+                " movzbq %al, %rax\n";
             break;
         case GE_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " setge %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " setge %al\n"
+                " movzbq %al, %rax\n";
             break;
         case EQ_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " sete %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " sete %al\n"
+                " movzbq %al, %rax\n";
             break;
         case NE_OP:
             out << " cmpq %rcx, %rax\n"
-                   " movl $0, %eax\n"
-                   " setne %al\n"
-                   " movzbq %al, %rax\n";
+                " movl $0, %eax\n"
+                " setne %al\n"
+                " movzbq %al, %rax\n";
             break;
         case OR_OP:
             out << " orq %rcx, %rax\n"
-                   " cmpq $0, %rax\n"
-                   " movl $0, %eax\n"
-                   " setne %al\n"
-                   " movzbq %al, %rax\n";
+                " cmpq $0, %rax\n"
+                " movl $0, %eax\n"
+                " setne %al\n"
+                " movzbq %al, %rax\n";
             break;
         case AND_OP:
             out << " andq %rcx, %rax\n"
-                   " cmpq $0, %rax\n"
-                   " movl $0, %eax\n"
-                   " setne %al\n"
-                   " movzbq %al, %rax\n";
+                " cmpq $0, %rax\n"
+                " movl $0, %eax\n"
+                " setne %al\n"
+                " movzbq %al, %rax\n";
             break;
     }
     return 0;
 }
+
 int GenCodeVisitor::visit(AssignStatement* stm) {
     stm->rhs->accept(this);
 
     if (entornoClase) {
         int off = clases[nombreClase].off[stm->id];
         out << " movq %rax, " << off << "(%rdi)\n";
-    } else if (memoriaGlobal.count(stm->id)) {
+    } else if (memoriaGlobal.contains(stm->id)) {
         out << " movq %rax, " << stm->id << "(%rip)\n";
     } else {
         out << " movq %rax, " << memoria[stm->id] << "(%rbp)\n";
@@ -349,9 +350,9 @@ int GenCodeVisitor::visit(UnaryExp* exp) {
     switch (exp->op) {
         case NOT_OP:
             out << "  cmpq  $0,  %rax\n"
-                   "  movl  $0,  %eax\n"
-                   "  sete  %al\n"
-                   "  movzbq %al, %rax\n";
+                "  movl  $0,  %eax\n"
+                "  sete  %al\n"
+                "  movzbq %al, %rax\n";
             break;
 
         case NEG_OP:

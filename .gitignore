@@ -1,5 +1,6 @@
 # ---------------------------- compiler
 compiler/cmake-build-debug
+compiler/src/cmake-build-debug
 compiler/.idea
 compiler/lfw_funneled
 compiler/.conda

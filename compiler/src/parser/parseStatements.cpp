@@ -2,7 +2,7 @@
 
 StmtList* Parser::parseStatementList() {
     consumeENDL();
-    StmtList* sl = new StmtList();
+    auto* sl = new StmtList();
     Stm* aux = parseStatement();
     while (aux) {
         sl->add(aux);
@@ -14,7 +14,7 @@ StmtList* Parser::parseStatementList() {
 
 Block* Parser::parseBlock() {
     consumeENDL();
-    Block* block = new Block();
+    auto block = new Block();
     block->vardecl = parseVarDecList();
     consumeENDL();
     block->stmdecl = parseStatementList();
@@ -27,17 +27,19 @@ Stm* Parser::parseStatement() {
     Stm* stm = nullptr;
     if (match(Token::IF)) {
         return handleIfStatement();
-    } else if (match(Token::PRINT) || match(Token::PRINTLN)) {
+    }
+    if (match(Token::PRINT) || match(Token::PRINTLN)) {
         return handlePrintStatement();
-    } else if (match(Token::ID)) {
+    }
+    if (match(Token::ID)) {
         string var = previous->text;
         if (match(Token::LPAREN)) {
             return handleFCallStm(var);
-        } else if (match(Token::ASSIGN)) {
-            return handleAssignStatement(var);
-        } else {
-            errorHandler("ASSIGN O LPAREN", "ID");
         }
+        if (match(Token::ASSIGN)) {
+            return handleAssignStatement(var);
+        }
+        errorHandler("ASSIGN O LPAREN", "ID");
     } else if (match(Token::FOR)) {
         return handleForStatement();
     } else if (match(Token::WHILE)) {
@@ -51,7 +53,7 @@ Stm* Parser::parseStatement() {
 }
 
 FCallStm* Parser::handleFCallStm(string nombre) {
-    FCallStm* fc = new FCallStm();
+    auto* fc = new FCallStm();
     vector<Exp*> lista;
     if (match(Token::RPAREN)) {
         fc->argumentos = lista;
@@ -120,7 +122,7 @@ PrintStatement* Parser::handlePrintStatement() {
     return new PrintStatement(e, type);
 }
 
-AssignStatement* Parser::handleAssignStatement(string nombre) {
+AssignStatement* Parser::handleAssignStatement(const string& nombre) {
     Exp* e = nullptr;
     e = parseExpression();
     if (!match(Token::ENDL)) {
@@ -143,14 +145,14 @@ ForStatement* Parser::handleForStatement() {
         errorHandler("IN", "FOR");
     }
     e = parseExpression();
-    AssignStatement* astm = new AssignStatement();
+    auto* astm = new AssignStatement();
     astm->id = var;
     astm->rhs = e;
     if (!match(Token::RANGE)) {
         errorHandler("RANGE", "FOR");
     }
     Exp* end = parseExpression();
-    IdentifierExp* id = new IdentifierExp(var);
+    auto* id = new IdentifierExp(var);
 
     Exp* condition = new BinaryExp(id, end, LE_OP);
     if (!match(Token::RPAREN)) {
@@ -164,14 +166,14 @@ ForStatement* Parser::handleForStatement() {
         errorHandler("RBRACE", "FOR");
     }
     consumeENDL();
-    ForStatement* fstm = new ForStatement();
+    auto* fstm = new ForStatement();
     fstm->begin = astm;
     fstm->end = condition;
     fstm->block = block;
 
-    NumberExp* number = new NumberExp(1);
-    BinaryExp* sum = new BinaryExp(id, number, PLUS_OP);
-    AssignStatement* step = new AssignStatement(var, sum);
+    auto* number = new NumberExp(1);
+    auto sum = new BinaryExp(id, number, PLUS_OP);
+    auto step = new AssignStatement(var, sum);
 
     fstm->step = step;
     return fstm;

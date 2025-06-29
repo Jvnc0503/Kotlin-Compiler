@@ -1,13 +1,9 @@
 #ifndef VISITOR_H
 #define VISITOR_H
 #include <iostream>
-#include <list>
-#include <stack>
 #include <string>
-#include <vector>
-
 #include "environment.h"
-#include "exp/exp.h"
+#include "../exp/exp.h"
 
 class BinaryExp;
 class NumberExp;
@@ -31,7 +27,8 @@ class FCallStm;
 class ClassAccessor;
 
 class Visitor {
-   public:
+public:
+    virtual ~Visitor() = default;
     virtual int visit(BinaryExp* exp) = 0;
     virtual int visit(NumberExp* exp) = 0;
     virtual int visit(BoolExp* exp) = 0;
@@ -59,8 +56,8 @@ class Visitor {
     virtual int visit(ClassAccessor* p) = 0;
 };
 
-class PrintVisitor : public Visitor {
-   public:
+class PrintVisitor final : public Visitor {
+public:
     int imprimir(Program* program);
     int visit(BinaryExp* exp) override;
     int visit(NumberExp* exp) override;
@@ -94,13 +91,13 @@ struct ClassInfo {
     unordered_map<string, int> off;
 };
 
-class GenCodeVisitor : public Visitor {
-   private:
+class GenCodeVisitor final : public Visitor {
     bool recolectando = false;
     std::ostream& out;
 
-   public:
-    GenCodeVisitor(std::ostream& out) : out(out) {}
+public:
+    explicit GenCodeVisitor(std::ostream& out) : out(out) {
+    }
 
     void generar(Program* program);
     unordered_map<string, int> memoria;

@@ -1,13 +1,21 @@
 #include "visitor.h"
 
-int PrintVisitor::visit(Program* program) {
+int PrintVisitor::visit(Program* p) {
+    if (p->cl)
+        p->cl->accept(this);
+    if (p->vl)
+        p->vl->accept(this);
+    if (p->fl)
+        p->fl->accept(this);
     return 0;
 }
 
 int PrintVisitor::visit(BinaryExp* exp) {
+    cout << '(';
     exp->left->accept(this);
     cout << ' ' << Exp::binopToString(exp->op) << ' ';
     exp->right->accept(this);
+    cout << ')';
     return 0;
 }
 
@@ -32,7 +40,6 @@ int PrintVisitor::visit(IdentifierExp* exp) {
 int PrintVisitor::visit(AssignStatement* stm) {
     cout << stm->id << " = ";
     stm->rhs->accept(this);
-    cout << ";";
     return 0;
 }
 
@@ -40,11 +47,11 @@ int PrintVisitor::visit(PrintStatement* stm) {
     if (stm->type == "print") {
         cout << "print(";
         stm->exp->accept(this);
-        cout << ")";
+        cout << ')';
     } else {
         cout << "println(";
         stm->exp->accept(this);
-        cout << ")" << endl;
+        cout << ')';
     }
     cout.flush();
     return 0;
@@ -78,45 +85,42 @@ int PrintVisitor::visit(ForStatement* stm) {
 }
 
 int PrintVisitor::imprimir(Program* program) {
-    if (program->cl)
-        program->cl->accept(this);
-    if (program->vl)
-        program->vl->accept(this);
-    if (program->fl)
-        program->fl->accept(this);
-
+    program->accept(this);
     return 0;
 }
-int PrintVisitor::visit(VarDec* s) {
-    s->is_mut ? cout << "var " : cout << "val ";
-    cout << s->var;
-    cout << " :" << s->type;
-    if (s->stm != nullptr) {
+
+int PrintVisitor::visit(VarDec* stm) {
+    stm->is_mut ? cout << "var " : cout << "val ";
+    cout << stm->var;
+    if (!stm->type.empty()) {
+        cout << ": " << stm->type;
+    }
+    if (stm->stm != nullptr) {
         cout << " = ";
-        s->stm->rhs->accept(this);
-    };
+        stm->stm->rhs->accept(this);
+    }
     return 0;
 }
 
 int PrintVisitor::visit(VarDecList* stm) {
-    for (auto i : stm->vardecs) {
+    for (const auto& i : stm->vardecs) {
         i->accept(this);
-        cout << endl;
+        cout << '\n';
     }
     return 0;
 }
 
 int PrintVisitor::visit(StmtList* stm) {
-    for (auto i : stm->stm_list) {
+    for (const auto& i : stm->stm_list) {
         i->accept(this);
-        cout << endl;
+        cout << '\n';
     }
     return 0;
 }
 
-int PrintVisitor::visit(Block* stm) {
-    stm->vardecl->accept(this);
-    stm->stmdecl->accept(this);
+int PrintVisitor::visit(Block* b) {
+    b->vardecl->accept(this);
+    b->stmdecl->accept(this);
     return 0;
 }
 
@@ -130,14 +134,17 @@ int PrintVisitor::visit(WhileStatement* stm) {
 }
 
 int PrintVisitor::visit(ReturnStatement* stm) {
-    cout << "return ";
-    stm->ret->accept(this);
+    cout << "return";
+    if (stm->ret != nullptr) {
+        cout << ' ';
+        stm->ret->accept(this);
+    }
     return 0;
 }
 
-int PrintVisitor::visit(UnaryExp* e) {
-    e->op == UnaryOp::NOT_OP ? cout << "!" : cout << "-";
-    e->exp->accept(this);
+int PrintVisitor::visit(UnaryExp* exp) {
+    exp->op == UnaryOp::NOT_OP ? cout << "!" : cout << "-";
+    exp->exp->accept(this);
     return 0;
 }
 
@@ -159,32 +166,38 @@ int PrintVisitor::visit(Param* p) {
 }
 
 int PrintVisitor::visit(FunDec* fundec) {
-    cout << "fun " << fundec->id << " (";
+    cout << "fun " << fundec->id << '(';
     fundec->paramList->accept(this);
-    cout << ") :" << fundec->type << " {" << endl;
+    cout << ')';
+    if (!fundec->type.empty() && fundec->type != "Unit")
+        cout << ": " << fundec->type;
+    cout << " {\n";
     fundec->block->accept(this);
     cout << "}";
     return 0;
 }
 
 int PrintVisitor::visit(FunDecList* fl) {
-    for (auto f : fl->fundecs) {
+    for (const auto& f : fl->fundecs) {
         f->accept(this);
+        if (f != fl->fundecs.back()) {
+            cout << '\n';
+        }
     }
     return 0;
 }
 
-int PrintVisitor::visit(FCallExp* exp) {
-    cout << exp->nombre << "( ";
+int PrintVisitor::visit(FCallExp* fcall) {
+    cout << fcall->nombre << '(';
     bool first = true;
-    for (auto e : exp->argumentos) {
+    for (const auto& e : fcall->argumentos) {
         if (!first) {
             std::cout << ", ";
         }
         e->accept(this);
         first = false;
     }
-    cout << ")" << endl;
+    cout << ")";
     return 0;
 }
 
@@ -205,15 +218,16 @@ int PrintVisitor::visit(FCallStm* stm) {
 int PrintVisitor::visit(ClassDec* cd) {
     cout << "class " << cd->id << "(";
     cd->pl->accept(this);
-    cout << ") {" << endl;
+    cout << ") {\n";
     cd->vdl->accept(this);
-    cout << "}" << endl;
+    cout << "}\n";
     return 0;
 }
 
 int PrintVisitor::visit(ClassDecList* cdl) {
-    for (auto cd : cdl->classdecs) {
+    for (const auto& cd : cdl->classdecs) {
         cd->accept(this);
+        cout << '\n';
     }
     return 0;
 }

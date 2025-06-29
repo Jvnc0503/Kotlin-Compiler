@@ -1,14 +1,16 @@
 #include "token.h"
-
 #include <ostream>
 #include <unordered_map>
 
-Token::Token(const Type type, const int line, const int column) : type(type), line(line), column(column) {}
+Token::Token(const Type type, const int line, const int column) : type(type), line(line), column(column) {
+}
 
-Token::Token(const Type type, const char c, const int line, const int column) : type(type), text(std::string(1, c)), line(line), column(column) {}
+Token::Token(const Type type, const char c, const int line, const int column) : type(type), text(std::string(1, c)), line(line), column(column) {
+}
 
 Token::Token(const Type type, const std::string& source, const int& first, const int& length, const int line, const int column)
-    : type(type), text(source.substr(first, length)), line(line), column(column) {}
+    : type(type), text(source.substr(first, length)), line(line), column(column) {
+}
 
 std::string Token::typeToString(const Type& type) {
     static const std::unordered_map<Type, std::string> types = {{PLUS, "PLUS"},
@@ -63,7 +65,7 @@ std::string Token::typeToString(const Type& type) {
 }
 
 std::ostream& operator<<(std::ostream& os, const Token& t) {
-    os << "TOKEN(" << Token::typeToString(t.type) << ", " << t.text << ")";
+    os << "TOKEN(" << Token::typeToString(t.type) << ", \"" << t.text << "\")";
     os << "\tline " << t.line << ", column " << t.column << '\n';
     return os;
 }

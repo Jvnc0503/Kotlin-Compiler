@@ -1,12 +1,11 @@
 #include "scanner.h"
-
 #include <iostream>
 #include <unordered_map>
 #include <utility>
-
 #include "token.h"
 
-Scanner::Scanner(std::string input) : input(std::move(input)), first(0), current(0) {}
+Scanner::Scanner(std::string input) : input(std::move(input)), first(0), current(0) {
+}
 
 bool Scanner::is_white_space(const char c) {
     return c == ' ' || c == '\r' || c == '\t';
@@ -22,9 +21,9 @@ void Scanner::reset() {
 }
 
 static std::unordered_map<std::string, Token::Type> keywords = {
-    {"var", Token::VAR},           {"val", Token::VAL},        {"fun", Token::FUN},           {"class", Token::CLASS},   {"if", Token::IF},       {"else", Token::ELSE},       {"while", Token::WHILE},
-    {"for", Token::FOR},           {"break", Token::BREAK},    {"continue", Token::CONTINUE}, {"return", Token::RETURN}, {"in", Token::IN},       {"this", Token::THIS},       {"Int", Token::INT_TYPE},
-    {"Boolean", Token::BOOL_TYPE}, {"Unit", Token::UNIT_TYPE}, {"true", Token::TRUE},         {"false", Token::FALSE},   {"print", Token::PRINT}, {"println", Token::PRINTLN},
+    {"var", Token::VAR}, {"val", Token::VAL}, {"fun", Token::FUN}, {"class", Token::CLASS}, {"if", Token::IF}, {"else", Token::ELSE}, {"while", Token::WHILE},
+    {"for", Token::FOR}, {"break", Token::BREAK}, {"continue", Token::CONTINUE}, {"return", Token::RETURN}, {"in", Token::IN}, {"this", Token::THIS}, {"Int", Token::INT_TYPE},
+    {"Boolean", Token::BOOL_TYPE}, {"Unit", Token::UNIT_TYPE}, {"true", Token::TRUE}, {"false", Token::FALSE}, {"print", Token::PRINT}, {"println", Token::PRINTLN},
 };
 
 Token* Scanner::nextToken() {
@@ -194,7 +193,7 @@ Token* Scanner::nextToken() {
 
 void Scanner::test() {
     Token* current;
-    std::cout << "Testing Scanner:\n\n";
+    std::cout << "Testing Scanner:\n";
     while ((current = nextToken())->type != Token::ENDOFFILE) {
         if (current->type == Token::ERROR) {
             std::cout << "Scanner error, invalid character:\n" << current;
@@ -205,5 +204,6 @@ void Scanner::test() {
         delete current;
     }
     std::cout << current;
+    std::cout << "Scanner successful\n";
     delete current;
 }

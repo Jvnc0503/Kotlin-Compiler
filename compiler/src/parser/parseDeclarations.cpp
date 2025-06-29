@@ -1,8 +1,10 @@
 #include "parser.h"
+#include "../exp/exp.h"
+#include "../scanner/token.h"
 
 VarDecList* Parser::parseVarDecList() {
     consumeENDL();
-    VarDecList* vdl = new VarDecList();
+    auto* vdl = new VarDecList();
     VarDec* aux = parseVarDec();
     while (aux) {
         vdl->add(aux);
@@ -16,28 +18,26 @@ VarDec* Parser::parseVarDec() {
     consumeENDL();
     if (!(check(Token::VAL) || check(Token::VAR))) {
         return nullptr;
-    } else {
-        bool is_mut;
-        string name;
-        if (match(Token::VAL)) {
-            is_mut = false;
-        } else if (match(Token::VAR)) {
-            is_mut = true;
-        }
-        if (!match(Token::ID)) {
-            errorHandler("ID", "VarDec");
-        }
-        name = previous->text;
-        if (match(Token::COLON)) {
-            return handleVarDecWithExplicitType(is_mut, name);
-        } else {
-            return handleVarDecWithImplicitType(is_mut, name);
-        }
     }
+    bool is_mut;
+    string name;
+    if (match(Token::VAL)) {
+        is_mut = false;
+    } else if (match(Token::VAR)) {
+        is_mut = true;
+    }
+    if (!match(Token::ID)) {
+        errorHandler("ID", "VarDec");
+    }
+    name = previous->text;
+    if (match(Token::COLON)) {
+        return handleVarDecWithExplicitType(is_mut, name);
+    }
+    return handleVarDecWithImplicitType(is_mut, name);
 }
 
 VarDec* Parser::handleVarDecWithImplicitType(bool is_mut, string name) {
-    VarDec* vd = new VarDec();
+    auto* vd = new VarDec();
     vd->is_mut = is_mut;
     vd->var = name;
     vd->is_implicit = true;
@@ -45,13 +45,13 @@ VarDec* Parser::handleVarDecWithImplicitType(bool is_mut, string name) {
         errorHandler("ASSIGN", "VARDEC");
     }
     Exp* e = parseExpression();
-    AssignStatement* astm = new AssignStatement(name, e);
+    auto* astm = new AssignStatement(name, e);
     vd->stm = astm;
     return vd;
 }
 
 VarDec* Parser::handleVarDecWithExplicitType(bool is_mut, string name) {
-    VarDec* vd = new VarDec();
+    auto* vd = new VarDec();
     vd->is_mut = is_mut;
     vd->var = name;
     vd->is_implicit = false;
@@ -79,7 +79,7 @@ VarDec* Parser::handleVarDecWithExplicitType(bool is_mut, string name) {
 
 FunDecList* Parser::parseFunDecList() {
     consumeENDL();
-    FunDecList* fdl = new FunDecList();
+    auto* fdl = new FunDecList();
 
     FunDec* aux = parseFunDec();
     while (aux) {
@@ -95,7 +95,7 @@ FunDec* Parser::parseFunDec() {
     if (!check(Token::FUN)) {
         return nullptr;
     }
-    FunDec* fundec = new FunDec();
+    auto* fundec = new FunDec();
     if (!match(Token::FUN)) {
         errorHandler("FUN", "FUNDEC");
     }
@@ -116,7 +116,7 @@ FunDec* Parser::parseFunDec() {
         }
         fundec->type = previous->text;
     } else {
-        fundec->type = "unit";
+        fundec->type = "Unit";
     }
     if (!match(Token::LBRACE)) {
         errorHandler("LBRACE", "FUNDEC");
@@ -132,7 +132,7 @@ FunDec* Parser::parseFunDec() {
 }
 
 ParamList* Parser::parseParamList() {
-    ParamList* pl = new ParamList();
+    auto* pl = new ParamList();
 
     Param* param = parseParam();
     if (!param) {
@@ -149,6 +149,7 @@ ParamList* Parser::parseParamList() {
     }
     return pl;
 }
+
 Param* Parser::parseParam() {
     if (check(Token::VAL)) {
         advance();
@@ -181,7 +182,7 @@ Param* Parser::parseParam() {
 
 ClassDecList* Parser::parseClassDecList() {
     consumeENDL();
-    ClassDecList* cdl = new ClassDecList();
+    auto* cdl = new ClassDecList();
 
     ClassDec* aux = parseClassDec();
     while (aux) {
@@ -197,7 +198,7 @@ ClassDec* Parser::parseClassDec() {
     if (!match(Token::CLASS)) {
         return nullptr;
     }
-    ClassDec* cd = new ClassDec();
+    auto* cd = new ClassDec();
     if (!match(Token::ID)) {
         errorHandler("ID", "CLASSDEC");
     }

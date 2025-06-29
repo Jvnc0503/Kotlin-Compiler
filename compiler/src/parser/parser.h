@@ -1,18 +1,17 @@
 #ifndef PARSER_H
 #define PARSER_H
-
-#include "exp/exp.h"
-#include "iostream"
-#include "scanner/scanner.h"
+#include <iostream>
+#include "../scanner/token.h"
+#include "../scanner/scanner.h"
+#include "../exp/exp.h"
 
 class Parser {
-   private:
     Scanner* scanner;
     Token *current, *previous;
     bool match(Token::Type ttype);
-    bool check(Token::Type ttype);
+    bool check(Token::Type ttype) const;
     bool advance();
-    bool isAtEnd();
+    bool isAtEnd() const;
     list<Stm*> parseStmList();
     Exp* parseExpression();
     Exp* parseLogicAnd();
@@ -22,23 +21,25 @@ class Parser {
     Exp* parseFactor();
     Exp* parseUnary();
     Exp* parsePrimary();
-    static void errorHandler(string token, string regla) {
-        std::cout << "Error: se esperaba un " << token << " en " << regla << std::endl;
+
+    static void errorHandler(const string& token, const string& rule) {
+        std::cerr << "Error: se esperaba un " << token << " en " << rule << '\n';
         exit(1);
     }
+
     void consumeENDL();
     vector<Exp*> parseArguments();
     IfStatement* handleIfStatement();
     PrintStatement* handlePrintStatement();
     ForStatement* handleForStatement();
     WhileStatement* handleWhileStatement();
-    AssignStatement* handleAssignStatement(string nombre);
+    AssignStatement* handleAssignStatement(const string& nombre);
     FCallStm* handleFCallStm(string nombre);
     VarDec* handleVarDecWithImplicitType(bool is_mut, string name);
     VarDec* handleVarDecWithExplicitType(bool is_mut, string name);
 
-   public:
-    Parser(Scanner* scanner);
+public:
+    explicit Parser(Scanner* scanner);
     Program* parseProgram();
     Stm* parseStatement();
     StmtList* parseStatementList();

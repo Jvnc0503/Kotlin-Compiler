@@ -27,6 +27,7 @@ Exp* Parser::parseEquality() {
     }
     return left;
 }
+
 Exp* Parser::parseComparison() {
     Exp* left = parseTerm();
     while (match(Token::LT) || match(Token::LTE) || match(Token::GT) || match(Token::GTE)) {
@@ -45,7 +46,7 @@ Exp* Parser::parseComparison() {
                 op = GE_OP;
                 break;
             default:
-                op = GE_OP;  // nunca debería suceder
+                op = GE_OP; // nunca debería suceder
         }
         Exp* right = parseTerm();
         left = new BinaryExp(left, right, op);
@@ -91,43 +92,48 @@ Exp* Parser::parseUnary() {
 Exp* Parser::parsePrimary() {
     if (match(Token::INT_LITERAL)) {
         return new NumberExp(stoi(previous->text));
-    } else if (match(Token::TRUE)) {
+    }
+    if (match(Token::TRUE)) {
         return new BoolExp(1);
-    } else if (match(Token::FALSE)) {
+    }
+    if (match(Token::FALSE)) {
         return new BoolExp(0);
-    } else if (match(Token::ID)) {
-        string nombre = previous->text;
+    }
+    if (match(Token::ID)) {
+        const string nombre = previous->text;
         if (match(Token::LPAREN)) {
-            FCallExp* fcall = new FCallExp();
+            auto* fcall = new FCallExp();
             fcall->nombre = nombre;
             isupper(nombre[0]) ? fcall->is_class = true : fcall->is_class = false;
-            fcall->argumentos = parseArguments();
             if (!match(Token::RPAREN)) {
-                errorHandler("RPAREN", "FCALL");
+                fcall->argumentos = parseArguments();
+                if (!match(Token::RPAREN)) {
+                    errorHandler("RPAREN", "FCALL");
+                }
             }
             return fcall;
-        } else if (match(Token::DOT)) {
-            ClassAccessor* ca = new ClassAccessor();
+        }
+        if (match(Token::DOT)) {
+            auto* ca = new ClassAccessor();
             if (!match(Token::ID)) {
                 errorHandler("ID", "CLASS_ACCESSOR");
             }
             ca->object = nombre;
             ca->parameter = previous->text;
             return ca;
-        } else {
-            return new IdentifierExp(nombre);
         }
-
-    } else if (match(Token::LPAREN)) {
+        return new IdentifierExp(nombre);
+    }
+    if (match(Token::LPAREN)) {
         Exp* e = parseExpression();
         if (!match(Token::RPAREN)) {
             errorHandler("RPAREN", "PRIMARY");
         }
         return e;
-    } else {
-        return nullptr;
     }
+    return nullptr;
 }
+
 vector<Exp*> Parser::parseArguments() {
     vector<Exp*> args;
 

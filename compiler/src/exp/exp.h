@@ -1,14 +1,13 @@
 #ifndef EXP_H
 #define EXP_H
-
 #include <list>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 class Visitor;
 
 using namespace std;
+
 enum BinaryOp {
     PLUS_OP,
     MINUS_OP,
@@ -23,151 +22,167 @@ enum BinaryOp {
     OR_OP,
     AND_OP,
 };
+
 enum UnaryOp { NOT_OP, NEG_OP };
 
 class FunDec;
 class VarDec;
 class Block;
-class Programm;
 class StmDec;
 class VarDecList;
 class StmtList;
 
 class Exp {
-   public:
+public:
     virtual int accept(Visitor* visitor) = 0;
     virtual ~Exp() = 0;
     static string binopToString(BinaryOp op);
 };
 
-class BinaryExp : public Exp {
-   public:
+class BinaryExp final : public Exp {
+public:
     Exp *left, *right;
     string type;
     BinaryOp op;
     BinaryExp(Exp* l, Exp* r, BinaryOp op);
-    int accept(Visitor* visitor);
-    ~BinaryExp();
+    int accept(Visitor* visitor) override;
+    ~BinaryExp() override;
 };
 
-class UnaryExp : public Exp {
-   public:
+class UnaryExp final : public Exp {
+public:
     Exp* exp;
     UnaryOp op;
     UnaryExp(Exp* e, UnaryOp op);
-    ~UnaryExp();
-    int accept(Visitor* visitor);
+    ~UnaryExp() override;
+    int accept(Visitor* visitor) override;
 };
 
-class NumberExp : public Exp {
-   public:
+class NumberExp final : public Exp {
+public:
     int value;
-    NumberExp(int v);
-    int accept(Visitor* visitor);
-    ~NumberExp();
+    explicit NumberExp(int v);
+    int accept(Visitor* visitor) override;
+    ~NumberExp() override;
 };
 
-class BoolExp : public Exp {
-   public:
+class BoolExp final : public Exp {
+public:
     int value;
-    BoolExp(bool v);
-    int accept(Visitor* visitor);
-    ~BoolExp();
+    explicit BoolExp(bool v);
+    int accept(Visitor* visitor) override;
+    ~BoolExp() override;
 };
 
-class IdentifierExp : public Exp {
-   public:
+class IdentifierExp final : public Exp {
+public:
     std::string name;
-    IdentifierExp(const std::string& n);
-    int accept(Visitor* visitor);
-    ~IdentifierExp();
+    explicit IdentifierExp(const std::string& n);
+    int accept(Visitor* visitor) override;
+    ~IdentifierExp() override;
 };
 
 class Stm {
-   public:
+public:
     virtual int accept(Visitor* visitor) = 0;
     virtual ~Stm() = 0;
 };
 
 class StmtList {
-   public:
+public:
     list<Stm*> stm_list;
-    StmtList(){};
+
+    StmtList() = default;
     ~StmtList();
     void add(Stm* s) { stm_list.push_back(s); }
     int accept(Visitor* visitor);
 };
 
 class AssignStatement : public Stm {
-   public:
+public:
     std::string id;
     Exp* rhs;
     AssignStatement(std::string id, Exp* e);
-    AssignStatement(){};
-    int accept(Visitor* visitor);
-    ~AssignStatement();
+
+    AssignStatement(): rhs(nullptr) {
+    }
+
+    int accept(Visitor* visitor) override;
+    ~AssignStatement() override;
 };
 
-class PrintStatement : public Stm {
-   public:
+class PrintStatement final : public Stm {
+public:
     string type;
     Exp* exp;
     PrintStatement(Exp* e, string t);
-    PrintStatement(){};
-    int accept(Visitor* visitor);
-    ~PrintStatement();
+
+    PrintStatement(): exp(nullptr) {
+    }
+
+    int accept(Visitor* visitor) override;
+    ~PrintStatement() override;
 };
 
-class ReturnStatement : public Stm {
-   public:
+class ReturnStatement final : public Stm {
+public:
     Exp* ret;
-    ReturnStatement(Exp* r);
-    ~ReturnStatement();
-    int accept(Visitor* visitor);
+    explicit ReturnStatement(Exp* r);
+    ~ReturnStatement() override;
+    int accept(Visitor* visitor) override;
 };
 
-class ForStatement : public Stm {
-   public:
+class ForStatement final : public Stm {
+public:
     AssignStatement* begin;
     Exp* end;
     AssignStatement* step;
     Block* block;
-    ForStatement(){};
-    int accept(Visitor* visitor);
-    ~ForStatement();
+
+    ForStatement(): begin(nullptr), end(nullptr), step(nullptr), block(nullptr) {
+    }
+
+    int accept(Visitor* visitor) override;
+    ~ForStatement() override;
 };
 
-class WhileStatement : public Stm {
-   public:
+class WhileStatement final : public Stm {
+public:
     Exp* condition;
     Block* block;
     WhileStatement(Exp* c, Block* b);
-    ~WhileStatement();
-    int accept(Visitor* visitor);
+    ~WhileStatement() override;
+    int accept(Visitor* visitor) override;
 };
 
-class IfStatement : public Stm {
-   public:
+class IfStatement final : public Stm {
+public:
     Exp* condition;
     Block* then;
     Block* els;
     IfStatement(Exp* condition, Block* then, Block* els);
-    IfStatement(){};
-    int accept(Visitor* visitor);
-    ~IfStatement();
+
+    IfStatement(): condition(nullptr), then(nullptr), els(nullptr) {
+    }
+
+    int accept(Visitor* visitor) override;
+    ~IfStatement() override;
 };
 
 class Block {
-   public:
+public:
     VarDecList* vardecl;
     StmtList* stmdecl;
-    Block(){};
+
+    Block(): vardecl(nullptr), stmdecl(nullptr) {
+    }
+
     ~Block();
     int accept(Visitor* visitor);
 };
 
 class Param {
-   public:
+public:
     string id;
     string type;
     Param(string i, string t);
@@ -176,110 +191,134 @@ class Param {
 };
 
 class ParamList {
-   public:
+public:
     vector<Param*> param_list;
-    ParamList() {}
+
+    ParamList() = default;
+
     void add(Param* param) { param_list.push_back(param); };
     ~ParamList();
     int accept(Visitor* visitor);
 };
 
-class ClassAccessor : public Exp {
-   public:
+class ClassAccessor final : public Exp {
+public:
     string object;
     string parameter;
-    ClassAccessor(){};
-    ~ClassAccessor(){};
-    int accept(Visitor* visitor);
+
+    ClassAccessor() = default;
+
+    ~ClassAccessor() override = default;
+    int accept(Visitor* visitor) override;
 };
 
-class FCallExp : public Exp {
-   public:
+class FCallExp final : public Exp {
+public:
     string nombre;
     vector<Exp*> argumentos;
     bool is_class;
-    FCallExp(){};
-    ~FCallExp(){};
-    int accept(Visitor* visitor);
+
+    FCallExp(): is_class(false) {
+    }
+
+    ~FCallExp() override = default;
+    int accept(Visitor* visitor) override;
 };
 
-class FCallStm : public Stm {
-   public:
+class FCallStm final : public Stm {
+public:
     string nombre;
     vector<Exp*> argumentos;
-    FCallStm(){};
-    ~FCallStm(){};
-    int accept(Visitor* visitor);
+
+    FCallStm() = default;
+
+    ~FCallStm() override = default;
+
+    int accept(Visitor* visitor) override;
 };
 
 class FunDec {
-   public:
+public:
     string id;
     string type;
     ParamList* paramList;
     Block* block;
-    FunDec(){};
+
+    FunDec(): paramList(nullptr), block(nullptr) {
+    }
+
     ~FunDec();
     int accept(Visitor* visitor);
 };
 
 class FunDecList {
-   public:
+public:
     list<FunDec*> fundecs;
     void add(FunDec* fundec) { fundecs.push_back(fundec); };
-    FunDecList(){};
+
+    FunDecList() = default;
     ~FunDecList();
     int accept(Visitor* visitor);
 };
 
 class VarDec {
-   public:
+public:
     bool is_mut;
     string type;
     string var;
     bool is_implicit;
     AssignStatement* stm;
-    VarDec(){};
+
+    VarDec(): is_mut(false), is_implicit(false), stm(nullptr) {
+    }
+
     int accept(Visitor* visitor);
     ~VarDec();
 };
 
 class VarDecList {
-   public:
+public:
     list<VarDec*> vardecs;
     void add(VarDec* vardec);
-    VarDecList(){};
+
+    VarDecList() = default;
     ~VarDecList();
     int accept(Visitor* visitor);
 };
 
 class ClassDec {
-   public:
+public:
     string id;
     VarDecList* vdl;
     ParamList* pl;
 
-    ClassDec(){};
+    ClassDec(): vdl(nullptr), pl(nullptr) {
+    }
+
     ~ClassDec();
     int accept(Visitor* visitor);
 };
 
 class ClassDecList {
-   public:
+public:
     list<ClassDec*> classdecs;
     void add(ClassDec* cd) { classdecs.push_back(cd); }
-    ClassDecList(){};
+
+    ClassDecList() = default;
     ~ClassDecList();
     int accept(Visitor* visitor);
 };
 
 class Program {
-   public:
+public:
     VarDecList* vl;
     FunDecList* fl;
     ClassDecList* cl;
     StmtList* stml;
-    Program() : vl(nullptr), fl(nullptr), cl(nullptr), stml(nullptr) {}
+
+    Program() : vl(nullptr), fl(nullptr), cl(nullptr), stml(nullptr) {
+    }
+
     ~Program();
     int accept(Visitor* visitor);
 };

@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
 #include "parser/parser.h"
 #include "scanner/scanner.h"
 #include "visitor/visitor.h"
@@ -27,34 +26,30 @@ int main(const int argc, const char* argv[]) {
     Scanner scanner(input);
     scanner.test();
     scanner.reset();
-    cout << "Scanner exitoso" << endl;
-    cout << endl;
-    cout << "Iniciando parsing:" << endl;
     Parser parser(&scanner);
+    cout << "\nStarting parsing:\n";
     try {
         Program* program = parser.parseProgram();
-        cout << "Parsing exitoso" << endl << endl;
-        cout << "Iniciando Visitor:" << endl;
+        cout << "Parsing successful\n\n";
         PrintVisitor print_visitor;
-        cout << "Iniciando PrintVisitor:" << endl;
+        cout << "Starting PrintVisitor:\n\n";
         print_visitor.imprimir(program);
 
         ofstream outfile("output.s");
         if (!outfile.is_open()) {
             cerr << "Error al crear el archivo de salida: output.s" << endl;
             return 1;
-        };
+        }
 
-        cout << "\n\nGenerando codigo ensamblador en "
-             << "output.s" << endl;
         GenCodeVisitor codigo(outfile);
+        cout << "\n\nStarting code generation:\n";
         codigo.generar(program);
         outfile.close();
+        cout << "Code generation successful. Output written to output.s\n";
         delete program;
     } catch (const exception& e) {
         cout << "Error durante la ejecución: " << e.what() << endl;
         return 1;
     }
-
     return 0;
 }
