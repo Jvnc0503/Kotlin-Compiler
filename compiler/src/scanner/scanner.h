@@ -6,7 +6,6 @@
 struct Scanner {
     std::string input;
     int first, current, line = 1, column = 1;
-    bool precededBySemicolon = false;
 
     explicit Scanner(std::string input);
 

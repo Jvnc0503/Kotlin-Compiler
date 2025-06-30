@@ -173,7 +173,7 @@ int PrintVisitor::visit(FunDec* fundec) {
         cout << ": " << fundec->type;
     cout << " {\n";
     fundec->block->accept(this);
-    cout << "}";
+    cout << '}';
     return 0;
 }
 
@@ -181,7 +181,7 @@ int PrintVisitor::visit(FunDecList* fl) {
     for (const auto& f : fl->fundecs) {
         f->accept(this);
         if (f != fl->fundecs.back()) {
-            cout << '\n';
+            cout << "\n\n";
         }
     }
     return 0;

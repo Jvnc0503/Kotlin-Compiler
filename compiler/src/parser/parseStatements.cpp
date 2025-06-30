@@ -13,12 +13,12 @@ StmtList* Parser::parseStatementList() {
 }
 
 Block* Parser::parseBlock() {
-    consumeENDL();
+    consumeSeparator();
     auto block = new Block();
     block->vardecl = parseVarDecList();
-    consumeENDL();
+    consumeSeparator();
     block->stmdecl = parseStatementList();
-    consumeENDL();
+    consumeSeparator();
     return block;
 }
 

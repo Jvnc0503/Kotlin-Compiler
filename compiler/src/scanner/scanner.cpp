@@ -42,13 +42,7 @@ Token* Scanner::nextToken() {
     // Handle newline after semicolon
     if (c == '\n') {
         current++;
-        line++;
-        column = 1;
-        if (precededBySemicolon) {
-            precededBySemicolon = false;
-            return nextToken();
-        }
-        return new Token(Token::ENDL, "\\n", 0, 2, line, column);
+        return new Token(Token::ENDL, "\\n", 0, 2, line++, column = 1);
     }
 
     first = current;
@@ -62,7 +56,6 @@ Token* Scanner::nextToken() {
             current++;
             column++;
         }
-        precededBySemicolon = false;
         return new Token(Token::INT_LITERAL, input, first, current - first, tokenLine, tokenColumn);
     }
 
@@ -76,7 +69,6 @@ Token* Scanner::nextToken() {
         }
         const std::string word = input.substr(first, current - first);
         const Token::Type type = keywords.contains(word) ? keywords[word] : Token::ID;
-        precededBySemicolon = false;
         return new Token(type, word, 0, word.length(), tokenLine, tokenColumn);
     }
 
@@ -86,43 +78,36 @@ Token* Scanner::nextToken() {
         if (two == "==") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::EQEQ, tokenLine, tokenColumn);
         }
         if (two == "!=") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::NEQ, tokenLine, tokenColumn);
         }
         if (two == "<=") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::LTE, tokenLine, tokenColumn);
         }
         if (two == ">=") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::GTE, tokenLine, tokenColumn);
         }
         if (two == "&&") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::AND, tokenLine, tokenColumn);
         }
         if (two == "||") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::OR, tokenLine, tokenColumn);
         }
         if (two == "..") {
             current += 2;
             column += 2;
-            precededBySemicolon = false;
             return new Token(Token::RANGE, tokenLine, tokenColumn);
         }
     }
@@ -177,12 +162,10 @@ Token* Scanner::nextToken() {
             break;
         case ';':
             type = Token::SEMICOLON;
-            precededBySemicolon = true;
             break;
         default:
             current++;
             column++;
-            precededBySemicolon = false;
             return new Token(Token::ERROR, c, tokenLine, tokenColumn);
     }
 
