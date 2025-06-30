@@ -82,8 +82,9 @@ FunDec* Parser::parseFunDec() {
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "FUNDEC");
     }
-    ParamList* paramlist = parseParamList();
+    ParamList* paramlist = parseFunParamList();
     if (!match(Token::RPAREN)) {
+        std::cout << current;
         errorHandler("RPAREN", "FUNDEC");
     }
     std::string type;
@@ -105,17 +106,17 @@ FunDec* Parser::parseFunDec() {
     return new FunDec(id, type, paramlist, block);
 }
 
-ParamList* Parser::parseParamList() {
+ParamList* Parser::parseFunParamList() {
     auto* pl = new ParamList();
 
-    Param* param = parseParam();
+    Param* param = parseFunParam();
     if (param == nullptr) {
         return pl;
     }
     pl->add(param);
     while (match(Token::COMMA)) {
         consumeENDL();
-        param = parseParam();
+        param = parseFunParam();
         if (!param) {
             errorHandler("PARAM", "PARAMLIST");
         }
@@ -124,7 +125,42 @@ ParamList* Parser::parseParamList() {
     return pl;
 }
 
-Param* Parser::parseParam() {
+Param* Parser::parseFunParam() {
+    if (!match(Token::ID)) {
+        return nullptr;
+    }
+    const std::string id = previous->text;
+    if (!match(Token::COLON)) {
+        errorHandler("COLON", "PARAM");
+    }
+    if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID))) {
+        std::cerr << "Error: se esperaba un tipo válido después de ':'\n";
+        exit(1);
+    }
+    const std::string type = previous->text;
+    return new Param(id, type);
+}
+
+ParamList* Parser::parseClassParamList() {
+    auto* pl = new ParamList();
+
+    Param* param = parseClassParam();
+    if (param == nullptr) {
+        return pl;
+    }
+    pl->add(param);
+    while (match(Token::COMMA)) {
+        consumeENDL();
+        param = parseClassParam();
+        if (!param) {
+            errorHandler("PARAM", "PARAMLIST");
+        }
+        pl->add(param);
+    }
+    return pl;
+}
+
+Param* Parser::parseClassParam() {
     if (!match(Token::VAL)) {
         return nullptr;
     }
@@ -167,7 +203,7 @@ ClassDec* Parser::parseClassDec() {
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "CLASSDECS");
     }
-    ParamList* pl = parseParamList();
+    ParamList* pl = parseClassParamList();
     if (!match(Token::RPAREN)) {
         errorHandler("RPAREN", "CLASSDECS");
     }

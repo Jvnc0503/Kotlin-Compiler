@@ -20,6 +20,19 @@ class Parser {
     Exp* parseFactor();
     Exp* parseUnary();
     Exp* parsePrimary();
+    Stm* parseStatement();
+    StmtList* parseStatementList();
+    VarDec* parseVarDec();
+    VarDecList* parseVarDecList();
+    Block* parseBlock();
+    FunDecList* parseFunDecList();
+    FunDec* parseFunDec();
+    ClassDecList* parseClassDecList();
+    ClassDec* parseClassDec();
+    ParamList* parseFunParamList();
+    Param* parseFunParam();
+    ParamList* parseClassParamList();
+    Param* parseClassParam();
 
     static void errorHandler(const std::string& token, const std::string& rule) {
         std::cerr << "Error: se esperaba un " << token << " en " << rule << '\n';
@@ -41,17 +54,6 @@ class Parser {
 public:
     explicit Parser(Scanner* scanner);
     Program* parseProgram();
-    Stm* parseStatement();
-    StmtList* parseStatementList();
-    VarDec* parseVarDec();
-    VarDecList* parseVarDecList();
-    Block* parseBlock();
-    FunDecList* parseFunDecList();
-    FunDec* parseFunDec();
-    ClassDecList* parseClassDecList();
-    ClassDec* parseClassDec();
-    ParamList* parseParamList();
-    Param* parseParam();
 };
 
 #endif  // PARSER_H

@@ -62,11 +62,11 @@ int PrintVisitor::visit(IfStatement* stm) {
     stm->condition->accept(this);
     cout << ") {" << endl;
     stm->then->accept(this);
-    cout << " }" << endl;
+    cout << "}\n";
     if (stm->els) {
         cout << "else {" << endl;
         stm->els->accept(this);
-        cout << "\n} " << endl;
+        cout << '}';
     }
     return 0;
 }
@@ -127,7 +127,7 @@ int PrintVisitor::visit(Block* b) {
 int PrintVisitor::visit(WhileStatement* stm) {
     cout << "while (";
     stm->condition->accept(this);
-    cout << " ) {";
+    cout << " ) {\n";
     stm->block->accept(this);
     cout << "}";
     return 0;
