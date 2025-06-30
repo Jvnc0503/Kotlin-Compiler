@@ -100,7 +100,7 @@ Exp* Parser::parsePrimary() {
         return new BoolExp(0);
     }
     if (match(Token::ID)) {
-        const string nombre = previous->text;
+        const std::string nombre = previous->text;
         if (match(Token::LPAREN)) {
             auto* fcall = new FCallExp();
             fcall->nombre = nombre;
@@ -134,8 +134,8 @@ Exp* Parser::parsePrimary() {
     return nullptr;
 }
 
-vector<Exp*> Parser::parseArguments() {
-    vector<Exp*> args;
+std::vector<Exp*> Parser::parseArguments() {
+    std::vector<Exp*> args;
 
     if (check(Token::RPAREN))
         return args;

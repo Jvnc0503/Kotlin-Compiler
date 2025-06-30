@@ -16,7 +16,7 @@ NumberExp::NumberExp(const int v) : value(v) {
 BoolExp::BoolExp(const bool v) : value(v) {
 }
 
-IdentifierExp::IdentifierExp(string n) : name(std::move(n)) {
+IdentifierExp::IdentifierExp(std::string n) : name(std::move(n)) {
 }
 
 Exp::~Exp() = default;
@@ -94,11 +94,12 @@ WhileStatement::~WhileStatement() {
     delete block;
 }
 
-VarDec::VarDec(const bool is_mut, string var, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), var(std::move(var)), is_implicit(is_implicit), stm(stm) {
+VarDec::VarDec(const bool is_mut, std::string var, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), var(std::move(var)), is_implicit(is_implicit), stm(stm) {
 }
 
-VarDec::VarDec(const bool is_mut, string type, string var, const bool is_implicit, AssignStatement* stm): is_mut(is_mut), type(std::move(type)), var(std::move(var)), is_implicit(is_implicit),
-                                                                                                          stm(stm) {
+VarDec::VarDec(const bool is_mut, std::string type, std::string var, const bool is_implicit, AssignStatement* stm): is_mut(is_mut), type(std::move(type)), var(std::move(var)),
+                                                                                                                    is_implicit(is_implicit),
+                                                                                                                    stm(stm) {
 }
 
 VarDec::~VarDec() {

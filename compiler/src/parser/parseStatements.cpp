@@ -32,7 +32,7 @@ Stm* Parser::parseStatement() {
         return handlePrintStatement();
     }
     if (match(Token::ID)) {
-        string var = previous->text;
+        std::string var = previous->text;
         if (match(Token::LPAREN)) {
             return handleFCallStm(var);
         }
@@ -52,9 +52,9 @@ Stm* Parser::parseStatement() {
     return stm;
 }
 
-FCallStm* Parser::handleFCallStm(string nombre) {
+FCallStm* Parser::handleFCallStm(const std::string& nombre) {
     auto* fc = new FCallStm();
-    vector<Exp*> lista;
+    std::vector<Exp*> lista;
     if (match(Token::RPAREN)) {
         fc->argumentos = lista;
         fc->nombre = nombre;
@@ -65,7 +65,7 @@ FCallStm* Parser::handleFCallStm(string nombre) {
         lista.push_back(parseExpression());
     }
     if (!match(Token::RPAREN)) {
-        cout << "Error: se esperaba un ')' después de la lista de argumentos." << endl;
+        std::cerr << "Error: se esperaba un ')' después de la lista de argumentos.\n";
         exit(1);
     }
     fc->argumentos = lista;
@@ -106,7 +106,7 @@ IfStatement* Parser::handleIfStatement() {
 }
 
 PrintStatement* Parser::handlePrintStatement() {
-    string type = previous->text;
+    std::string type = previous->text;
     Exp* e = nullptr;
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "PRINT");
@@ -122,7 +122,7 @@ PrintStatement* Parser::handlePrintStatement() {
     return new PrintStatement(e, type);
 }
 
-AssignStatement* Parser::handleAssignStatement(const string& nombre) {
+AssignStatement* Parser::handleAssignStatement(const std::string& nombre) {
     Exp* e = nullptr;
     e = parseExpression();
     if (!match(Token::ENDL)) {
@@ -140,7 +140,7 @@ ForStatement* Parser::handleForStatement() {
     if (!match(Token::ID)) {
         errorHandler("ID", "FOR");
     }
-    string var = previous->text;
+    const std::string var = previous->text;
     if (!match(Token::IN)) {
         errorHandler("IN", "FOR");
     }

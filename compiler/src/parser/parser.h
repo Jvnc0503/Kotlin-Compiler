@@ -21,21 +21,21 @@ class Parser {
     Exp* parseUnary();
     Exp* parsePrimary();
 
-    static void errorHandler(const string& token, const string& rule) {
+    static void errorHandler(const std::string& token, const std::string& rule) {
         std::cerr << "Error: se esperaba un " << token << " en " << rule << '\n';
         exit(1);
     }
 
     void consumeENDL();
-    vector<Exp*> parseArguments();
+    std::vector<Exp*> parseArguments();
     IfStatement* handleIfStatement();
     PrintStatement* handlePrintStatement();
     ForStatement* handleForStatement();
     WhileStatement* handleWhileStatement();
-    AssignStatement* handleAssignStatement(const string& nombre);
-    FCallStm* handleFCallStm(string nombre);
-    VarDec* handleVarDecWithImplicitType(bool is_mut, const string& name);
-    VarDec* handleVarDecWithExplicitType(bool is_mut, const string& name);
+    AssignStatement* handleAssignStatement(const std::string& nombre);
+    FCallStm* handleFCallStm(const std::string& nombre);
+    VarDec* handleVarDecWithImplicitType(bool is_mut, const std::string& name);
+    VarDec* handleVarDecWithExplicitType(bool is_mut, const std::string& name);
 
 public:
     explicit Parser(Scanner* scanner);

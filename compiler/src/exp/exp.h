@@ -6,8 +6,6 @@
 
 class Visitor;
 
-using namespace std;
-
 enum BinaryOp {
     PLUS_OP,
     MINUS_OP,
@@ -36,13 +34,13 @@ class Exp {
 public:
     virtual int accept(Visitor* visitor) = 0;
     virtual ~Exp() = 0;
-    static string binopToString(BinaryOp op);
+    static std::string binopToString(BinaryOp op);
 };
 
 class BinaryExp final : public Exp {
 public:
     Exp *left, *right;
-    string type;
+    std::string type;
     BinaryOp op;
     BinaryExp(Exp* l, Exp* r, BinaryOp op);
     int accept(Visitor* visitor) override;
@@ -90,7 +88,7 @@ public:
 
 class StmtList {
 public:
-    list<Stm*> stm_list;
+    std::list<Stm*> stm_list;
 
     StmtList() = default;
     ~StmtList();
@@ -113,9 +111,9 @@ public:
 
 class PrintStatement final : public Stm {
 public:
-    string type;
+    std::string type;
     Exp* exp;
-    PrintStatement(Exp* e, string t);
+    PrintStatement(Exp* e, std::string t);
 
     PrintStatement(): exp(nullptr) {
     }
@@ -183,16 +181,16 @@ public:
 
 class Param {
 public:
-    string id;
-    string type;
-    Param(string i, string t);
+    std::string id;
+    std::string type;
+    Param(std::string i, std::string t);
     ~Param();
     int accept(Visitor* visitor);
 };
 
 class ParamList {
 public:
-    vector<Param*> param_list;
+    std::vector<Param*> param_list;
 
     ParamList() = default;
 
@@ -203,8 +201,8 @@ public:
 
 class ClassAccessor final : public Exp {
 public:
-    string object;
-    string parameter;
+    std::string object;
+    std::string parameter;
 
     ClassAccessor() = default;
 
@@ -214,8 +212,8 @@ public:
 
 class FCallExp final : public Exp {
 public:
-    string nombre;
-    vector<Exp*> argumentos;
+    std::string nombre;
+    std::vector<Exp*> argumentos;
     bool is_class;
 
     FCallExp(): is_class(false) {
@@ -227,8 +225,8 @@ public:
 
 class FCallStm final : public Stm {
 public:
-    string nombre;
-    vector<Exp*> argumentos;
+    std::string nombre;
+    std::vector<Exp*> argumentos;
 
     FCallStm() = default;
 
@@ -239,8 +237,8 @@ public:
 
 class FunDec {
 public:
-    string id;
-    string type;
+    std::string id;
+    std::string type;
     ParamList* paramList;
     Block* block;
 
@@ -253,7 +251,7 @@ public:
 
 class FunDecList {
 public:
-    list<FunDec*> fundecs;
+    std::list<FunDec*> fundecs;
     void add(FunDec* fundec) { fundecs.push_back(fundec); };
 
     FunDecList() = default;
@@ -264,14 +262,14 @@ public:
 class VarDec {
 public:
     bool is_mut;
-    string type;
-    string var;
+    std::string type;
+    std::string var;
     bool is_implicit;
     AssignStatement* stm;
 
-    VarDec(bool is_mut, string var, bool is_implicit, AssignStatement* stm);
+    VarDec(bool is_mut, std::string var, bool is_implicit, AssignStatement* stm);
 
-    VarDec(bool is_mut, string type, string var, bool is_implicit, AssignStatement* stm);
+    VarDec(bool is_mut, std::string type, std::string var, bool is_implicit, AssignStatement* stm);
 
     int accept(Visitor* visitor);
     ~VarDec();
@@ -279,7 +277,7 @@ public:
 
 class VarDecList {
 public:
-    list<VarDec*> vardecs;
+    std::list<VarDec*> vardecs;
     void add(VarDec* vardec);
 
     VarDecList() = default;
@@ -289,7 +287,7 @@ public:
 
 class ClassDec {
 public:
-    string id;
+    std::string id;
     VarDecList* vdl;
     ParamList* pl;
 
@@ -302,7 +300,7 @@ public:
 
 class ClassDecList {
 public:
-    list<ClassDec*> classdecs;
+    std::list<ClassDec*> classdecs;
     void add(ClassDec* cd) { classdecs.push_back(cd); }
 
     ClassDecList() = default;

@@ -1,5 +1,4 @@
 #include <unordered_map>
-
 #include "parser.h"
 #include "../exp/exp.h"
 #include "../scanner/token.h"
@@ -27,14 +26,14 @@ VarDec* Parser::parseVarDec() {
     if (!match(Token::ID)) {
         errorHandler("ID", "VarDec");
     }
-    const string name = previous->text;
+    const std::string name = previous->text;
     if (match(Token::COLON)) {
         return handleVarDecWithExplicitType(is_mut, name);
     }
     return handleVarDecWithImplicitType(is_mut, name);
 }
 
-VarDec* Parser::handleVarDecWithImplicitType(const bool is_mut, const string& name) {
+VarDec* Parser::handleVarDecWithImplicitType(const bool is_mut, const std::string& name) {
     if (!match(Token::ASSIGN)) {
         errorHandler("ASSIGN", "VarDec");
     }
@@ -45,9 +44,9 @@ VarDec* Parser::handleVarDecWithImplicitType(const bool is_mut, const string& na
 
 static std::unordered_map<Token::Type, std::string> typeMap = {{Token::BOOL_TYPE, "Boolean"}, {Token::INT_TYPE, "Int"}, {Token::UNIT_TYPE, "Unit"}};
 
-VarDec* Parser::handleVarDecWithExplicitType(const bool is_mut, const string& name) {
+VarDec* Parser::handleVarDecWithExplicitType(const bool is_mut, const std::string& name) {
     if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE))) {
-        cout << "Error: se esperaba un tipo válido después de ':'\n";
+        std::cerr << "Error: se esperaba un tipo válido después de ':'\n";
         exit(1);
     }
     const std::string type = typeMap[previous->type];
@@ -88,7 +87,7 @@ FunDec* Parser::parseFunDec() {
     if (!match(Token::ID)) {
         errorHandler("ID", "FUNDEC");
     }
-    string id = previous->text;
+    std::string id = previous->text;
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "FUNDEC");
     }
