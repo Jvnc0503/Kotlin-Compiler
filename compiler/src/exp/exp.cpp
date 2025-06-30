@@ -97,8 +97,9 @@ WhileStatement::~WhileStatement() {
 VarDec::VarDec(const bool is_mut, std::string name, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), name(std::move(name)), is_implicit(is_implicit), stm(stm) {
 }
 
-VarDec::VarDec(const bool is_mut, std::string name, std::string type, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), name(std::move(name)), type(std::move(type)), is_implicit(is_implicit),
-                                                                                                          stm(stm) {
+VarDec::VarDec(const bool is_mut, std::string name, std::string type, const bool is_implicit, AssignStatement* stm) : is_mut(is_mut), name(std::move(name)), type(std::move(type)),
+                                                                                                                      is_implicit(is_implicit),
+                                                                                                                      stm(stm) {
 }
 
 
