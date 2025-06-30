@@ -2,7 +2,7 @@ class Rectangle(val height: Int, val length: Int) {
     val perimeter = (height + length) * 2
 }
 
-fun sumaPerimetros(val x: Int, val y: Int) {
+fun sumaPerimetros(x: Int, y: Int) {
     return x + y
 }
 

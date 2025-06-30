@@ -161,7 +161,7 @@ ParamList* Parser::parseClassParamList() {
 }
 
 Param* Parser::parseClassParam() {
-    if (!match(Token::VAL)) {
+    if (!(match(Token::VAR) || match(Token::VAL))) {
         return nullptr;
     }
     if (!match(Token::ID)) {
