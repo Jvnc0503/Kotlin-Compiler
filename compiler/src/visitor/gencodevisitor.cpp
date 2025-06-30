@@ -30,26 +30,26 @@ int GenCodeVisitor::visit(Program* program) {
 int GenCodeVisitor::visit(VarDec* s) {
     if (entornoClase) {
         if (!s->stm) {
-            out << " movq $0, " << clases[nombreClase].off[s->var] << "(%rdi)" << endl;
+            out << " movq $0, " << clases[nombreClase].off[s->name] << "(%rdi)" << endl;
         } else {
             s->stm->accept(this);
             // out << " movq %rax, " << clases[nombreClase].off[s->var] << "(%rdi)" << endl;
-            memoria[s->var] = offset;
+            memoria[s->name] = offset;
             offset -= 8;
         }
     } else {
         if (!entornoFuncion) {
-            memoriaGlobal[s->var] = true;
+            memoriaGlobal[s->name] = true;
 
             if (s->stm) {
                 s->stm->accept(this);
-                out << " movq %rax, " << s->var << "(%rip)\n";
+                out << " movq %rax, " << s->name << "(%rip)\n";
             }
             return 0;
         }
         out << " subq $8, %rsp\n";
 
-        memoria[s->var] = offset;
+        memoria[s->name] = offset;
         offset -= 8;
 
         if (s->stm) {
@@ -57,11 +57,11 @@ int GenCodeVisitor::visit(VarDec* s) {
             // out << " movq %rax, " << memoria[s->var] << "(%rbp)\n";
             if (auto fcall = dynamic_cast<FCallExp*>(s->stm->rhs)) {
                 if (fcall->is_class) {
-                    tipoClase[s->var] = fcall->nombre;
+                    tipoClase[s->name] = fcall->nombre;
                 }
             }
         } else {
-            out << " movq $0, " << memoria[s->var] << "(%rbp)\n";
+            out << " movq $0, " << memoria[s->name] << "(%rbp)\n";
         }
     }
 
@@ -94,7 +94,7 @@ int GenCodeVisitor::visit(ClassDec* cd) {
     }
 
     for (auto v : cd->vdl->vardecs) {
-        info.off[v->var] = local_offset;
+        info.off[v->name] = local_offset;
         local_offset += 8;
     }
 
@@ -126,18 +126,16 @@ int GenCodeVisitor::visit(FunDec* f) {
     out << " movq %rsp, %rbp" << endl;
     int size = f->paramList->param_list.size();
     for (int i = 0; i < size; i++) {
-    auto* param = f->paramList->param_list[i];
-    memoria[param->id] = offset;
-    out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
+        auto* param = f->paramList->param_list[i];
+        memoria[param->id] = offset;
+        out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
 
-    if (clases.contains(param->type)) {
-        tipoClase[param->id] = param->type;
-    };
-    
+        if (clases.contains(param->type)) {
+            tipoClase[param->id] = param->type;
+        };
 
-    offset -= 8;
+        offset -= 8;
     }
-
 
     f->block->vardecl->accept(this);
     int reserva = (-offset);

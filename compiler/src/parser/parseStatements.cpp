@@ -3,18 +3,20 @@
 StmtList* Parser::parseStatementList() {
     consumeENDL();
     auto* sl = new StmtList();
-    Stm* aux = parseStatement();
-    while (aux) {
+    Stm* aux = nullptr;
+    while ((aux = parseStatement())) {
         sl->add(aux);
-        consumeENDL();
-        aux = parseStatement();
+        if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
+            errorHandler("ENDL | SEMICOLON", "Statement");
+        }
+        consumeSeparator();
     }
     return sl;
 }
 
 Block* Parser::parseBlock() {
     consumeSeparator();
-    auto block = new Block();
+    auto* block = new Block();
     block->vardecl = parseVarDecList();
     consumeSeparator();
     block->stmdecl = parseStatementList();
@@ -32,7 +34,7 @@ Stm* Parser::parseStatement() {
         return handlePrintStatement();
     }
     if (match(Token::ID)) {
-        std::string var = previous->text;
+        const std::string var = previous->text;
         if (match(Token::LPAREN)) {
             return handleFCallStm(var);
         }
@@ -89,7 +91,7 @@ IfStatement* Parser::handleIfStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "IF");
     }
-    consumeENDL();
+    consumeSeparator();
     if (match(Token::ELSE)) {
         if (!match(Token::LBRACE)) {
             errorHandler("LBRACE", "IF");
@@ -99,10 +101,6 @@ IfStatement* Parser::handleIfStatement() {
             errorHandler("RBRACE", "IF");
         }
     }
-    if (!match(Token::ENDL)) {
-        errorHandler("ENDL", "IF");
-    }
-    consumeENDL();
     return new IfStatement(e, tb, eb);
 }
 
@@ -116,20 +114,12 @@ PrintStatement* Parser::handlePrintStatement() {
     if (!match(Token::RPAREN)) {
         errorHandler("RPAREN", "PRINT");
     }
-    if (!match(Token::ENDL)) {
-        errorHandler("ENDL", "PRINT");
-    }
-    consumeENDL();
     return new PrintStatement(e, type);
 }
 
 AssignStatement* Parser::handleAssignStatement(const std::string& nombre) {
     Exp* e = nullptr;
     e = parseExpression();
-    if (!match(Token::ENDL)) {
-        errorHandler("ENDL", "ASSIGN");
-    }
-    consumeENDL();
     return new AssignStatement(nombre, e);
 }
 
@@ -166,7 +156,6 @@ ForStatement* Parser::handleForStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "FOR");
     }
-    consumeENDL();
     auto* fstm = new ForStatement();
     fstm->begin = astm;
     fstm->end = condition;

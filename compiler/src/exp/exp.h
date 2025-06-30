@@ -259,14 +259,14 @@ public:
 class VarDec {
 public:
     bool is_mut;
+    std::string name;
     std::string type;
-    std::string var;
     bool is_implicit;
     AssignStatement* stm;
 
-    VarDec(bool is_mut, std::string var, bool is_implicit, AssignStatement* stm);
+    VarDec(bool is_mut, std::string name, bool is_implicit, AssignStatement* stm);
 
-    VarDec(bool is_mut, std::string type, std::string var, bool is_implicit, AssignStatement* stm);
+    VarDec(bool is_mut, std::string name, std::string type, bool is_implicit, AssignStatement* stm);
 
     int accept(Visitor* visitor);
     ~VarDec();

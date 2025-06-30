@@ -91,7 +91,7 @@ int PrintVisitor::imprimir(Program* program) {
 
 int PrintVisitor::visit(VarDec* stm) {
     stm->is_mut ? cout << "var " : cout << "val ";
-    cout << stm->var;
+    cout << stm->name;
     if (!stm->type.empty()) {
         cout << ": " << stm->type;
     }
