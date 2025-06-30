@@ -6,21 +6,21 @@
 VarDecList* Parser::parseVarDecList() {
     consumeENDL();
     auto* vdl = new VarDecList();
-    VarDec* aux;
+    VarDec* aux = nullptr;
     while ((aux = parseVarDec())) {
         vdl->add(aux);
-        consumeENDL();
+        if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
+            errorHandler("ENDL | SEMICOLON", "VarDec");
+        }
+        consumeSeparator();
     }
     return vdl;
 }
 
 VarDec* Parser::parseVarDec() {
     consumeENDL();
-    if (!(check(Token::VAL) || check(Token::VAR))) {
+    if (!(match(Token::VAL) || match(Token::VAR))) {
         return nullptr;
-    }
-    if (!(match(Token::VAR) || match(Token::VAL))) {
-        errorHandler("VAR | VAL", "VarDec");
     }
     const bool is_mut = previous->type == Token::VAR;
     if (!match(Token::ID)) {
@@ -42,35 +42,27 @@ VarDec* Parser::handleVarDecWithImplicitType(const bool is_mut, const std::strin
     return new VarDec(is_mut, name, true, stm);
 }
 
-static std::unordered_map<Token::Type, std::string> typeMap = {{Token::BOOL_TYPE, "Boolean"}, {Token::INT_TYPE, "Int"}, {Token::UNIT_TYPE, "Unit"}};
-
 VarDec* Parser::handleVarDecWithExplicitType(const bool is_mut, const std::string& name) {
-    if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE))) {
-        std::cerr << "Error: se esperaba un tipo válido después de ':'\n";
+    if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID))) {
+        std::cerr << "Error: se esperaba un tipo después de ':'\n";
         exit(1);
     }
-    const std::string type = typeMap[previous->type];
+    const std::string type = previous->text;
     AssignStatement* stm = nullptr;
     if (match(Token::ASSIGN)) {
         Exp* e = parseExpression();
         stm = new AssignStatement(name, e);
     }
-    if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
-        errorHandler("ENDL | SEMICOLON", "VarDec");
-    }
-    consumeENDL();
     return new VarDec(is_mut, name, type, false, stm);
 }
 
 FunDecList* Parser::parseFunDecList() {
     consumeENDL();
     auto* fdl = new FunDecList();
-
-    FunDec* aux = parseFunDec();
-    while (aux) {
+    FunDec* aux = nullptr;
+    while ((aux = parseFunDec())) {
         fdl->add(aux);
-        consumeENDL();
-        aux = parseFunDec();
+        consumeSeparator();
     }
     return fdl;
 }
@@ -80,14 +72,13 @@ FunDec* Parser::parseFunDec() {
     if (!check(Token::FUN)) {
         return nullptr;
     }
-    auto* fundec = new FunDec();
     if (!match(Token::FUN)) {
         errorHandler("FUN", "FUNDEC");
     }
     if (!match(Token::ID)) {
         errorHandler("ID", "FUNDEC");
     }
-    std::string id = previous->text;
+    const std::string id = previous->text;
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "FUNDEC");
     }
@@ -95,13 +86,14 @@ FunDec* Parser::parseFunDec() {
     if (!match(Token::RPAREN)) {
         errorHandler("RPAREN", "FUNDEC");
     }
+    std::string type;
     if (match(Token::COLON)) {
-        if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE)) {
+        if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID)) {
             errorHandler("TYPE", "FUNDEC");
         }
-        fundec->type = previous->text;
+        type = previous->text;
     } else {
-        fundec->type = "Unit";
+        type = "Unit";
     }
     if (!match(Token::LBRACE)) {
         errorHandler("LBRACE", "FUNDEC");
@@ -110,17 +102,14 @@ FunDec* Parser::parseFunDec() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "FUNDEC");
     }
-    fundec->block = block;
-    fundec->paramList = paramlist;
-    fundec->id = id;
-    return fundec;
+    return new FunDec(id, type, paramlist, block);
 }
 
 ParamList* Parser::parseParamList() {
     auto* pl = new ParamList();
 
     Param* param = parseParam();
-    if (!param) {
+    if (param == nullptr) {
         return pl;
     }
     pl->add(param);
@@ -136,44 +125,31 @@ ParamList* Parser::parseParamList() {
 }
 
 Param* Parser::parseParam() {
-    if (check(Token::VAL)) {
-        advance();
-    }
-    if (!match(Token::ID)) {
+    if (!match(Token::VAL)) {
         return nullptr;
     }
-    std::string id = previous->text;
-
+    if (!match(Token::ID)) {
+        errorHandler("ID", "PARAM");
+    }
+    const std::string id = previous->text;
     if (!match(Token::COLON)) {
         errorHandler("COLON", "PARAM");
     }
-
-    std::string type;
-
-    if (match(Token::INT_TYPE)) {
-        type = "Int";
-    } else if (match(Token::BOOL_TYPE)) {
-        type = "Boolean";
-    } else if (match(Token::UNIT_TYPE)) {
-        type = "Unit";
-    } else if (match(Token::ID)) {
-        type = previous->text;
-    } else {
-        errorHandler("TYPE O ID", "PARAMLIST");
+    if (!(match(Token::BOOL_TYPE) || match(Token::INT_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID))) {
+        std::cerr << "Error: se esperaba un tipo válido después de ':'\n";
+        exit(1);
     }
-
+    const std::string type = previous->text;
     return new Param(id, type);
 }
 
 ClassDecList* Parser::parseClassDecList() {
     consumeENDL();
     auto* cdl = new ClassDecList();
-
-    ClassDec* aux = parseClassDec();
-    while (aux) {
+    ClassDec* aux = nullptr;
+    while ((aux = parseClassDec())) {
         cdl->add(aux);
-        consumeENDL();
-        aux = parseClassDec();
+        consumeSeparator();
     }
     return cdl;
 }

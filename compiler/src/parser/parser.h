@@ -27,6 +27,7 @@ class Parser {
     }
 
     void consumeENDL();
+    void consumeSeparator();
     std::vector<Exp*> parseArguments();
     IfStatement* handleIfStatement();
     PrintStatement* handlePrintStatement();

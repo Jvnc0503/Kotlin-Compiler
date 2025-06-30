@@ -43,6 +43,17 @@ void Parser::consumeENDL() {
     }
 }
 
+void Parser::consumeSeparator() {
+    Token::Type prev = Token::ENDL;
+    while (match(Token::ENDL) || match(Token::SEMICOLON)) {
+        if (prev == Token::SEMICOLON && current->type == Token::SEMICOLON) {
+            std::cerr << "Error: múltiples puntos y coma consecutivos.\n";
+            exit(1);
+        }
+        prev = previous->type;
+    }
+}
+
 Parser::Parser(Scanner* scanner) : scanner(scanner), previous(nullptr), current(scanner->nextToken()) {
     if (current->type == Token::ERROR) {
         std::cerr << "Error en el primer token: " << current->text << '\n';

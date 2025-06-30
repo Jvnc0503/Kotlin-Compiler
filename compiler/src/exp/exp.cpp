@@ -178,7 +178,11 @@ ClassDecList::~ClassDecList() {
     }
 }
 
+FunDec::FunDec(std::string id, std::string type, ParamList* paramList, Block* block) : id(std::move(id)), type(std::move(type)), paramList(paramList), block(block) {
+}
+
 FunDec::~FunDec() {
+    delete paramList;
     delete block;
 }
 

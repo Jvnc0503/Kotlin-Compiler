@@ -242,9 +242,7 @@ public:
     ParamList* paramList;
     Block* block;
 
-    FunDec(): paramList(nullptr), block(nullptr) {
-    }
-
+    FunDec(std::string id, std::string type, ParamList* paramList, Block* block);
     ~FunDec();
     int accept(Visitor* visitor);
 };
