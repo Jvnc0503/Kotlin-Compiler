@@ -89,7 +89,7 @@ FunDec* Parser::parseFunDec() {
     }
     std::string type;
     if (match(Token::COLON)) {
-        if (!match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID)) {
+        if (!(match(Token::INT_TYPE) || match(Token::BOOL_TYPE) || match(Token::UNIT_TYPE) || match(Token::ID))) {
             errorHandler("TYPE", "FUNDEC");
         }
         type = previous->text;
