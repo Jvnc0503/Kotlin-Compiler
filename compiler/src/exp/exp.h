@@ -23,7 +23,6 @@ enum BinaryOp {
 
 enum UnaryOp { NOT_OP, NEG_OP };
 
-class FunDec;
 class VarDec;
 class Block;
 class StmDec;

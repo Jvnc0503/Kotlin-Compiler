@@ -126,10 +126,18 @@ int GenCodeVisitor::visit(FunDec* f) {
     out << " movq %rsp, %rbp" << endl;
     int size = f->paramList->param_list.size();
     for (int i = 0; i < size; i++) {
-        memoria[f->paramList->param_list[i]->id] = offset;
-        out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
-        offset -= 8;
+    auto* param = f->paramList->param_list[i];
+    memoria[param->id] = offset;
+    out << " movq " << argRegs[i] << "," << offset << "(%rbp)" << endl;
+
+    if (clases.contains(param->type)) {
+        tipoClase[param->id] = param->type;
+    };
+    
+
+    offset -= 8;
     }
+
 
     f->block->vardecl->accept(this);
     int reserva = (-offset);
@@ -404,6 +412,7 @@ int GenCodeVisitor::visit(ClassAccessor* ca) {
     int local_offset = memoria[ca->object];
     string nombreClase = tipoClase[ca->object];
     int parameter_offset = clases[nombreClase].off[ca->parameter];
+    cout << "nombreClase: " << nombreClase << endl;
     out << " movq " << local_offset << "(%rbp),"
         << "%rax" << endl;
     out << " movq " << parameter_offset << "(%rax), %rax" << endl;

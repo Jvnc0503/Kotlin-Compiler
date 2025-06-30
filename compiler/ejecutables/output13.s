@@ -26,11 +26,9 @@ sumaPerimetros:
  movq %rdi,-8(%rbp)
  movq %rsi,-16(%rbp)
  subq $32, %rsp
- movq -8(%rbp),%rax
- movq 16(%rax), %rax
+ movq -8(%rbp), %rax
  pushq %rax
- movq -16(%rbp),%rax
- movq 16(%rax), %rax
+ movq -16(%rbp), %rax
  movq %rax, %rcx
  popq %rax
  addq %rcx, %rax
@@ -63,9 +61,11 @@ call Rectangle$ctor
  movq %rdi,%rax
  movq %rax, -24(%rbp)
  subq $48, %rsp
- movq -8(%rbp), %rax
+ movq -8(%rbp),%rax
+ movq 16(%rax), %rax
  mov %rax, %rdi
- movq -24(%rbp), %rax
+ movq -24(%rbp),%rax
+ movq 16(%rax), %rax
  mov %rax, %rsi
 call sumaPerimetros
  movq %rsp, %rbx

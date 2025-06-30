@@ -89,6 +89,7 @@ IfStatement* Parser::handleIfStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "IF");
     }
+    consumeENDL();
     if (match(Token::ELSE)) {
         if (!match(Token::LBRACE)) {
             errorHandler("LBRACE", "IF");

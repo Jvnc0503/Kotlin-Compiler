@@ -27,10 +27,10 @@ sumaPerimetros:
  movq %rsi,-16(%rbp)
  subq $32, %rsp
  movq -8(%rbp),%rax
- movq 16(%rax), %rax
+ movq 0(%rax), %rax
  pushq %rax
  movq -16(%rbp),%rax
- movq 16(%rax), %rax
+ movq 0(%rax), %rax
  movq %rax, %rcx
  popq %rax
  addq %rcx, %rax
