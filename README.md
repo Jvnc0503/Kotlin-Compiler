@@ -30,23 +30,19 @@ ClassDec ::= "class" Identifier "(" [ ClassParamList ] ")" "{" [ VarDecList ] "}
   ```
 - En el parser, esto se reconoce en `parsePrimary()`:
   - Si tras un identificador hay un punto (`.`) y otro identificador, se construye un nodo `ClassAccessor`.
-- En el AST, `ClassAccessor` almacena el nombre de la variable/objeto y el nombre del atributo.
+- En el AST, `ClassAccessor` almacena el nombre del objeto y el nombre del atributo.
 - En la generación de código, el visitor calcula el offset del atributo dentro de la clase y genera el código para acceder a ese campo en memoria.
 
-### Manejo de memoria y creación de objetos
-- Cuando se instancia una clase (por ejemplo, `val obj = MiClase(...)`), el generador de código:
-  1. Calcula el tamaño total del objeto sumando los offsets de los parámetros y campos.
-  2. Reserva espacio en el stack con `subq $<size>, %rsp`.
-  3. Obtiene la dirección base del objeto con `leaq 0(%rsp), %rdi` (el puntero al objeto se pasa en `%rdi`).
-  4. Copia los argumentos del constructor a los registros correspondientes (`%rsi`, `%rdx`, ...).
-  5. Llama al constructor de la clase (`call MiClase$ctor`).
-  6. Al finalizar, la dirección del objeto queda en `%rdi` y se mueve a `%rax` para su uso posterior.
-  7. Si el objeto es una variable local, **la variable almacena la dirección del objeto, no el objeto en sí**. Es decir, la variable contiene un puntero al área de memoria donde está el objeto.
-
-- Para acceder a un atributo:
-  1. Se recupera la dirección del objeto desde la pila (`movq <offset>(%rbp), %rax`).
-  2. Se suma el offset del atributo dentro del objeto y se accede a su valor (`movq <offset>(%rax), %rax`).
-
+### Manejo de memoria y referencias
+- En este compilador, **todas las variables de tipo clase almacenan una referencia (puntero) al objeto, no el objeto en sí**. Esto es equivalente al manejo de referencias implícitas en Kotlin y otros lenguajes modernos.
+- Cuando se instancia una clase (por ejemplo, `val obj = MiClase(...)`):
+  1. Se reserva espacio en el stack para el objeto (`subq $<size>, %rsp`).
+  2. Se obtiene la dirección base del objeto (`leaq 0(%rsp), %rdi`).
+  3. Se llama al constructor, que inicializa los campos en esa dirección.
+  4. **La variable local `obj` almacena la dirección (referencia) del objeto**. Todas las operaciones posteriores sobre `obj` usan esa referencia.
+- Cuando se asigna una variable de tipo clase a otra (`val b = a`), **ambas variables apuntan al mismo objeto** (referencia compartida).
+- El acceso a atributos (`obj.atributo`) siempre se realiza a través de la referencia almacenada en la variable.
+- No se realiza copia profunda del objeto al asignar o pasar como argumento, solo se copia la referencia.
 - La información de offsets y tamaños de cada clase se almacena en la estructura `clases` (`unordered_map<string, ClassInfo>`).
 
 ### Operaciones implementadas
@@ -55,6 +51,7 @@ ClassDec ::= "class" Identifier "(" [ ClassParamList ] ")" "{" [ VarDecList ] "}
 - Acceso a atributos de instancia (`objeto.atributo`)
 - Llamada a constructores
 - Soporte para múltiples clases y objetos
+- **Manejo de referencias implícitas para objetos (punteros a memoria)**
 
 ### Estructura y diseño de los visitors
 - **Visitor base (`Visitor`)**: Define métodos `visit` para cada tipo de nodo, incluyendo `ClassDec`, `ClassDecList` y `ClassAccessor`.
@@ -65,3 +62,37 @@ ClassDec ::= "class" Identifier "(" [ ClassParamList ] ")" "{" [ VarDecList ] "}
 1. El parser construye el AST de las clases y los accesos a atributos.
 2. El visitor de generación de código recorre el AST y produce el código ensamblador para clases, constructores y acceso a miembros.
 3. El visitor de impresión permite visualizar la estructura de clases y accesos para depuración.
+
+---
+
+## Referencias y Punteros
+
+### ¿Por qué las variables de objetos son referencias (punteros)?
+- En este compilador, siguiendo el modelo de Kotlin y Java, **todas las variables de tipo clase son referencias**. Esto significa que la variable almacena la dirección de memoria donde está el objeto, no una copia del objeto.
+- Esto permite que múltiples variables puedan referirse al mismo objeto y que las operaciones sobre una variable afecten al mismo objeto compartido.
+- Es eficiente: copiar una referencia es mucho más rápido que copiar todo el contenido de un objeto grande.
+
+### ¿Cómo funcionan las referencias en la implementación?
+- Cuando se crea un objeto, se reserva espacio en memoria (en el stack) y se obtiene su dirección.
+- Esa dirección se almacena en la variable que representa el objeto.
+- Al asignar una variable de tipo clase a otra, solo se copia la dirección (referencia), no el contenido del objeto.
+- El acceso a atributos y métodos siempre se realiza a través de la referencia.
+
+### Paso de referencias a funciones
+- Cuando se pasa un objeto como argumento a una función, **se pasa la referencia (puntero) al objeto**.
+- Dentro de la función, el parámetro recibe la dirección del objeto original, por lo que cualquier cambio sobre el objeto afecta al mismo objeto fuera de la función.
+- En el codegen, esto se implementa pasando la dirección del objeto en uno de los registros de argumentos (por ejemplo, `%rdi`, `%rsi`, etc.).
+- No se realiza copia profunda del objeto al pasar como argumento.
+
+### Ejemplo ilustrativo
+```kotlin
+val a = MiClase(1)
+val b = a // b y a apuntan al mismo objeto
+fun f(x: MiClase) {
+    x.valor = 42 // modifica el objeto original
+}
+f(a)
+```
+En este ejemplo, tanto `a` como `b` son referencias al mismo objeto. La función `f` recibe la referencia y puede modificar el objeto original.
+
+---
