@@ -100,6 +100,7 @@ FunDec* Parser::parseFunDec() {
         errorHandler("LBRACE", "FUNDEC");
     }
     Block* block = parseBlock();
+    std::cout << current->text << std::endl;
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "FUNDEC");
     }

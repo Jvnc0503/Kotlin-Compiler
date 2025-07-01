@@ -1,7 +1,13 @@
-fun print_fun(x: Int){
-    println(x)
-}
-
 fun main() {
-    print_fun(2)
+    val x = 2;
+    val y = 3;
+    if (y > x) {
+        x = y;
+    }
+    if (y == x) {
+        x = 1
+    }
+    if (x < y) {
+        print(x)
+    }
 }

@@ -6,13 +6,11 @@ StmtList* Parser::parseStatementList() {
     Stm* aux = nullptr;
     while ((aux = parseStatement())) {
         sl->add(aux);
-        if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
-            errorHandler("ENDL | SEMICOLON", "Statement");
-        }
         consumeSeparator();
     }
     return sl;
 }
+
 
 Block* Parser::parseBlock() {
     consumeSeparator();
@@ -76,7 +74,7 @@ FCallStm* Parser::handleFCallStm(const std::string& nombre) {
 }
 
 IfStatement* Parser::handleIfStatement() {
-    Block* eb;
+    Block* eb = nullptr;
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "IF");
     }
@@ -93,6 +91,7 @@ IfStatement* Parser::handleIfStatement() {
     }
     consumeSeparator();
     if (match(Token::ELSE)) {
+        consumeSeparator();
         if (!match(Token::LBRACE)) {
             errorHandler("LBRACE", "IF");
         }
@@ -153,6 +152,8 @@ ForStatement* Parser::handleForStatement() {
         errorHandler("LBRACE", "FOR");
     }
     Block* block = parseBlock();
+    // consumeSeparator();
+    // std::cout << current->text << std::endl;
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "FOR");
     }

@@ -1,13 +1,10 @@
+fun fib(n:Int):Int {
+    if (n <= 2) {
+        return 1
+    }
+    return fib(n-1) + fib(n-2)
+}
+
 fun main() {
-    var x: Int;
-    var y: Int;
-    x = 5;
-    if (0 < x) {
-        y = (x + 1) * (x + 1);
-    }
-    else {
-        y = x;
-    }
-    print(y);
-    return 0;
+    print(fib(5))
 }

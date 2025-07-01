@@ -1,11 +1,10 @@
+fun factorial(n: Int) :Int {
+    if (n == 1) {
+        return 1;
+    }
+    return factorial(n-1) * n
+}
+
 fun main() {
-    val x = 5;
-    val y = 0;
-    if ( 0 < x ) {
-        y = ( x + 1) * (x + 1)
-    }
-    else {
-        y = x
-    }
-    print(y)
+    print(factorial(8))
 }

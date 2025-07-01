@@ -1,7 +1,4 @@
-fun suma(a: Int, b: Int, c: Int): Int {
-    return a + b + c          
-}
-
 fun main() {
-    println(suma(1, 2, 3))
+    var a = (2 + 3) + ((3 / 3) - 2 * 4)
+    print(a)
 }

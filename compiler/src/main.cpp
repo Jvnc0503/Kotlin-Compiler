@@ -24,8 +24,8 @@ int main(const int argc, const char* argv[]) {
     infile.close();
 
     Scanner scanner(input);
-    scanner.test();
-    scanner.reset();
+    // scanner.test();
+    // scanner.reset();
     Parser parser(&scanner);
     cout << "\nStarting parsing:\n";
     try {
