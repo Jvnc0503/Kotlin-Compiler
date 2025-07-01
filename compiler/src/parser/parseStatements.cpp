@@ -76,7 +76,7 @@ FCallStm* Parser::handleFCallStm(const std::string& nombre) {
 }
 
 IfStatement* Parser::handleIfStatement() {
-    Block* eb;
+    Block* eb = nullptr;
     if (!match(Token::LPAREN)) {
         errorHandler("LPAREN", "IF");
     }
@@ -91,9 +91,8 @@ IfStatement* Parser::handleIfStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "IF");
     }
-    // consumeSeparator();
-    std::cout << current->text << std::endl;
     if (match(Token::ELSE)) {
+        consumeSeparator();
         if (!match(Token::LBRACE)) {
             errorHandler("LBRACE", "IF");
         }
@@ -154,6 +153,8 @@ ForStatement* Parser::handleForStatement() {
         errorHandler("LBRACE", "FOR");
     }
     Block* block = parseBlock();
+    // consumeSeparator();
+    // std::cout << current->text << std::endl;
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "FOR");
     }

@@ -410,7 +410,6 @@ int GenCodeVisitor::visit(ClassAccessor* ca) {
     int local_offset = memoria[ca->object];
     string nombreClase = tipoClase[ca->object];
     int parameter_offset = clases[nombreClase].off[ca->parameter];
-    cout << "nombreClase: " << nombreClase << endl;
     out << " movq " << local_offset << "(%rbp),"
         << "%rax" << endl;
     out << " movq " << parameter_offset << "(%rax), %rax" << endl;

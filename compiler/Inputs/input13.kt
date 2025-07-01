@@ -1,13 +1,13 @@
-class Rectangle(val height: Int, val length: Int) {
-    val perimeter = (height + length) * 2
+fun suma(x: Int, y: Int) {
+    return x + y;
 }
 
-fun sumaPerimetros(x: Int, y: Int) {
-    return x + y
+fun multiplicacion(x: Int, y: Int) {
+    return x * y;
 }
 
 fun main() {
-    val r1 = Rectangle(2, 4)
-    val r2 = Rectangle(3, 5)
-    println(sumaPerimetros(r1.perimeter, r2.perimeter))
-} 
+    val x = suma(2, 3);
+    val y = multiplicacion(2, 3);
+    print(x + y)
+}

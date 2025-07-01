@@ -31,9 +31,9 @@ int main(const int argc, const char* argv[]) {
     try {
         Program* program = parser.parseProgram();
         cout << "Parsing successful\n\n";
-        // PrintVisitor print_visitor;
-        // cout << "Starting PrintVisitor:\n\n";
-        // print_visitor.imprimir(program);
+        PrintVisitor print_visitor;
+        cout << "Starting PrintVisitor:\n\n";
+        print_visitor.imprimir(program);
 
         ofstream outfile("output.s");
         if (!outfile.is_open()) {
