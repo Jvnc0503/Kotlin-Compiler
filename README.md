@@ -30,8 +30,24 @@ ClassDec ::= "class" Identifier "(" [ ClassParamList ] ")" "{" [ VarDecList ] "}
   ```
 - En el parser, esto se reconoce en `parsePrimary()`:
   - Si tras un identificador hay un punto (`.`) y otro identificador, se construye un nodo `ClassAccessor`.
-- En el AST, `ClassAccessor` almacena el objeto y el nombre del atributo.
+- En el AST, `ClassAccessor` almacena el nombre de la variable/objeto y el nombre del atributo.
 - En la generación de código, el visitor calcula el offset del atributo dentro de la clase y genera el código para acceder a ese campo en memoria.
+
+### Manejo de memoria y creación de objetos
+- Cuando se instancia una clase (por ejemplo, `val obj = MiClase(...)`), el generador de código:
+  1. Calcula el tamaño total del objeto sumando los offsets de los parámetros y campos.
+  2. Reserva espacio en el stack con `subq $<size>, %rsp`.
+  3. Obtiene la dirección base del objeto con `leaq 0(%rsp), %rdi` (el puntero al objeto se pasa en `%rdi`).
+  4. Copia los argumentos del constructor a los registros correspondientes (`%rsi`, `%rdx`, ...).
+  5. Llama al constructor de la clase (`call MiClase$ctor`).
+  6. Al finalizar, la dirección del objeto queda en `%rdi` y se mueve a `%rax` para su uso posterior.
+  7. Si el objeto es una variable local, **la variable almacena la dirección del objeto, no el objeto en sí**. Es decir, la variable contiene un puntero al área de memoria donde está el objeto.
+
+- Para acceder a un atributo:
+  1. Se recupera la dirección del objeto desde la pila (`movq <offset>(%rbp), %rax`).
+  2. Se suma el offset del atributo dentro del objeto y se accede a su valor (`movq <offset>(%rax), %rax`).
+
+- La información de offsets y tamaños de cada clase se almacena en la estructura `clases` (`unordered_map<string, ClassInfo>`).
 
 ### Operaciones implementadas
 - Declaración de clases con parámetros y campos
