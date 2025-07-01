@@ -1,41 +1,50 @@
-Program         ::= { Declaration [END] { ENDL } }
+Program         ::= { VarDecList ClassDecList FunDecList }
 
-Declaration     ::= VarDecl
-                 | FunDecl
-                 | ClassDecl
+VarDecList      ::= { VarDec }
 
-VarDecl         ::= ("var" | "val") Identifier ( ":" Type )? "=" Expression END
+ClassDecList    ::= { ClassDec }
 
-FunDecl         ::= "fun" Identifier "(" [ ParamList ] ")" ( ":" Type )? Block
+FunDecList      ::= { FunDec }
 
-ClassDecl       ::= "class" Identifier "{" { Declaration [END] { ENDL } } "}"
+VarDec          ::= ("var" | "val") Identifier [ ":" Type ] "=" Exp END
 
-ParamList       ::= Parameter { "," Parameter }
-Parameter       ::= Identifier ":" Type
+ClassDec        ::= "class" Identifier "(" [ ClassParamList ] ")" "{" [ VarDecList ] "}"
+
+FunDec          ::= "fun" Identifier "(" [ FunParamList ] ")" [ ":" Type ] "{" Block "}"
+
+FunParamList    ::= Parameter { "," Parameter }
+
+FunParameter    ::= Identifier ":" Type
 
 Type            ::= "Int" | "Boolean" | "Unit"
 
-Block           ::= "{" { Statement [END] { ENDL } } "}"
+Block           ::= VarDecList StmtList
 
-Statement       ::= VarDecl
-                 | ExpressionStatement
-                 | IfStatement
-                 | WhileStatement
-                 | ForStatement
-                 | ReturnStatement
-                 | Block
+StmtList        ::= { Statement END { ENDL } }
 
-ExpressionStatement ::= Expression END
+Statement       ::= IfStatement
+                | PrintStatement
+                | FCallStm
+                | AssignStatement
+                | ForStatement
+                | WhileStatement
+                | ReturnStatement
 
-IfStatement     ::= "if" "(" Expression ")" Statement [ "else" Statement ]
+IfStatement     ::= "if" "(" Exp ")" "{" Block "}" [ "else" "{" Block "}" ]
 
-WhileStatement  ::= "while" "(" Expression ")" Statement
+PrintStatement  ::= ( "print" | "println" ) "(" Exp ")"
 
-ForStatement    ::= "for" "(" Identifier "in" Expression ".." Expression ")" Statement
+FCallStm        ::= Identifier "(" [ Exp { "," Exp } ] ")"
 
-ReturnStatement ::= "return" [ Expression ] END
+AssignStatement ::= Identifier "=" Exp
 
-Expression      ::= LogicAnd { "||" LogicAnd }
+ForStatement    ::= "for" "(" Identifier "in" Exp ".." Exp ")" "{" Block "}"
+
+WhileStatement  ::= "while" "(" Exp ")" "{" Block "}"
+
+ReturnStatement ::= "return" [ Exp ]
+
+Exp             ::= LogicAnd { "||" LogicAnd }
 
 LogicAnd        ::= Equality { "&&" Equality }
 
@@ -52,16 +61,13 @@ Unary           ::= ( "!" | "-" ) Unary
 
 Primary         ::= IntegerLiteral
                  | BooleanLiteral
-                 | "this"
                  | Identifier
-                 | "(" Expression ")"
-                 | Primary "." Identifier                  // member access
-                 | Identifier "(" [ ArgumentList ] ")"     // function call
+                 | Identifier "(" Arguments ")"
+                 | Primary "." Identifier
+                 | "(" Exp ")"
 
-ArgumentList    ::= Expression { "," Expression }
+BooleanLiteral  ::= ( true | false)
 
-END             ::= SEMICOLON | ENDL
+Arguments       ::= [ Exp { "," Exp } ]
 
-Identifier      ::= ID
-IntegerLiteral  ::= INT_LITERAL
-BooleanLiteral  ::= "true" | "false"
+END             ::= ";" | ENDL
