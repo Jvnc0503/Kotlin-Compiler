@@ -63,7 +63,7 @@ Primary         ::= IntegerLiteral
                  | BooleanLiteral
                  | Identifier
                  | Identifier "(" Arguments ")"
-                 | Primary "." Identifier
+                 | Identifier "." Identifier
                  | "(" Exp ")"
 
 BooleanLiteral  ::= ( true | false)
