@@ -1,4 +1,4 @@
-Program         ::= { VarDecList ClassDecList FunDecList }
+Program         ::= VarDecList ClassDecList FunDecList
 
 VarDecList      ::= { VarDec }
 

@@ -1,115 +1,91 @@
-\documentclass[a4paper,10pt]{article}
+\documentclass[a4paper,11pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
-\usepackage{amsmath}
-\allowdisplaybreaks
-\usepackage{amssymb}
-\usepackage[top=1cm,bottom=2cm,left=2cm,right=2cm]{geometry}
+\usepackage{amsmath,amssymb,mathtools}
+\usepackage[top=1cm,bottom=1cm,left=2cm,right=2cm]{geometry}
+% Reducimos espacio entre líneas en align y disminuimos tamaño de letra
+\setlength{\jot}{4pt}
+
 \begin{document}
+\pagestyle{empty} % Elimina números de página
 
 \section*{Gramática}
 
-\begin{alignat*}{2}
+\begin{alignat*}{3}
 % Program
-\textbf{Program}
-  \;&::=  \; \text{VarDecList} 
-    \; \text{FunDecList} 
-    \;\text{ClassDecList}  \\[3pt]
+&\textbf{Program}      &&\Coloneqq  \text{VarDecList}\;\text{ClassDecList}\;\text{FunDecList} &&\\
 % VarDecList
-\textbf{VarDecList}
-\;&::= \{ \; \text{VarDec}\; \} \\[3pt]
+&\textbf{VarDecList}   &&\Coloneqq  \lbrace\text{VarDec}\rbrace &&\\
+% ClassDecList
+&\textbf{ClassDecList} &&\Coloneqq  \lbrace\text{ClassDec}\rbrace &&\\
+% FunDecList
+&\textbf{FunDecList}   &&\Coloneqq  \lbrace\text{FunDec}\rbrace &&\\
 % VarDec
-\textbf{VarDec}
-  \;&::=\; (\;\textbf{var}\;\mid\;\textbf{val}\;)\;\text{Identifier}
-     \;(\;\textbf{:}\;\text{Type}\;)?
-     \; \text{(} \; \textbf{=}\;\text{Exp} \; \text{)} \;\text{END} \\[3pt]
-% FunDecList
-\textbf{FunDecList}
-\;&::= \{ \; \text{FunDec}\; \} \\[3pt]
-% FunDecl
-\textbf{FunDec}
-  \;&::=\; \textbf{fun}\;\text{Identifier}
-     \;\textbf{(}\;[\;\text{ParamList}\;]\;\textbf{)}
-     \;(\;\textbf{:}\;\text{Type}\;)?
-     \{ \;\text{Block}\; \} \\[3pt]
-% FunDecList
-\textbf{ClassDecList}
-\;&::= \{ \; \text{ClassDec}\; \} \\[3pt]
-% ClassDecl
-\textbf{ClassDec}
-  \;&::=\; \textbf{class}\;\text{Identifier}
-  \;\textbf{(}\;[\;\text{ParamList}\;]\;\textbf{)}
-     \;\textbf{\{}\;\text{VarDecList} \; \text{FunDecList}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\;\textbf{\}} \\[3pt]
-% ParamList
-\textbf{ParamList}
-  \;&::=\; \text{Parameter} \; \{ \; \textbf{,} \; \text{Parameter} \;\} \\[3pt]
-% Parameter
-\textbf{Parameter}
-  \;&::=\; \text{Identifier}\;\textbf{:}\;\text{Type} \\[3pt]
+&\textbf{VarDec}       &&\Coloneqq  (\textbf{var}\mid\textbf{val})\;\text{Identifier}\;[\textbf{:}\;\text{Type}] = \text{Exp}\;\text{END} &&\\
+% ClassDec
+&\textbf{ClassDec}     &&\Coloneqq  \textbf{class}\;\text{Identifier}([\text{ClassParamList}])\;\lbrace[\text{VarDecList}]\rbrace &&\\
+% FunDec
+&\textbf{FunDec}       &&\Coloneqq  \textbf{fun}\;\text{Identifier}([\text{FunParamList}])[:\;\text{Type}]\;\lbrace\text{Block}\rbrace &&\\
+% FunParamList
+&\textbf{FunParamList} &&\Coloneqq  \text{FunParameter}\;\lbrace,\;\text{FunParameter}\rbrace &&\\
+% FunParameter
+&\textbf{FunParameter} &&\Coloneqq  \text{Identifier}:\text{Type} &&\\
 % Type
-\textbf{Type}
-  \;&::=\; \textbf{Int}
-   \;|\;\textbf{Boolean}
-   \;|\;\textbf{Unit} \\[3pt]
+&\textbf{Type}         &&\Coloneqq  \textbf{Int}\mid\textbf{Boolean}\mid\textbf{Unit} &&\\
 % Block
-\textbf{Block}
-  \;&::=\; \text{VarDecList}  \; \text{StmtList} \; \\[3pt]
-% StmtDecl
-\textbf{StmtList}
-  \;&::=\; \{\;\text{Statement}\;[\;\text{END}\;]\;\{\;\text{ENDL}\;\}\} \\[3pt]
+&\textbf{Block}        &&\Coloneqq  \text{VarDecList}\;\text{StmtList} &&\\
+% StmtList
+&\textbf{StmtList}     &&\Coloneqq  \lbrace\text{Statement}\;\text{END}\;\lbrace \text{ENDL}\rbrace\rbrace &&\\
 % Statement
-\textbf{Statement}
-\;&::=\;  \text{Exp}\;\text{END} \\
-  \;&\mid\; \textbf{if}\;\textbf{(} \text{Exp} \textbf{)}\; \{ \; \text{Block} \; \}
-     \;[\;\textbf{else} \; \{  \;\text{Block} \; \} \;] \\[3pt]
-  \;&\mid\; \textbf{while}\;\textbf{(} \text{Exp} \textbf{)}\; \{ \; \text{Block}\; \} \\[3pt]
-  \;&\mid\; \textbf{for}\;\textbf{(}\; \text{Identifier}\;\textbf{in}\;\text{Exp}
-     \;\textbf{..}\;\text{Exp} \textbf{)}\; \{ \; \text{Block} \; \} \\[3pt]
-  \;&\mid\; \textbf{return}\;[\;\text{Exp}\;]\;\text{END} \\[3pt]
-  \;&\mid\; \textbf{print}\; \textbf{(} \; \text{Exp} \; \textbf{)} \\[3pt]
-  \;&\mid\; \textbf{println}\; \textbf{(} \; \text{Exp} \; \textbf{)} \\[3pt]
-  \;&\mid\; \text{Identifier}\;\textbf{=}\;\text{Exp}\\[3pt]
+&\textbf{Statement}    &&\Coloneqq  \text{IfStatement} &&\\
+&                       &&\quad\mid  \text{PrintStatement} &&\\
+&                       &&\quad\mid  \text{FCallStm} &&\\
+&                       &&\quad\mid  \text{AssignStatement} &&\\
+&                       &&\quad\mid  \text{ForStatement} &&\\
+&                       &&\quad\mid  \text{WhileStatement} &&\\
+&                       &&\quad\mid  \text{ReturnStatement} &&\\
+% IfStatement
+&\textbf{IfStatement}     &&\Coloneqq  \textbf{if}(\text{Exp})\lbrace \text{Block}\rbrace [\textbf{else}\lbrace \text{Block}\rbrace] &&\\
+% PrintStatement
+&\textbf{PrintStatement}  &&\Coloneqq  (\textbf{print}\mid\textbf{println})(\text{Exp}) &&\\
+% FCallStm
+&\textbf{FCallStm}        &&\Coloneqq  \text{Identifier}([\text{Exp}\;\lbrace,\;\text{Exp}\rbrace]) &&\\
+% AssignStatement
+&\textbf{AssignStatement} &&\Coloneqq  \text{Identifier} = \text{Exp} &&\\
+% ForStatement
+&\textbf{ForStatement}    &&\Coloneqq  \textbf{for}(\text{Identifier}\;\textbf{in}\;\text{Exp}..\text{Exp})\lbrace \text{Block}\rbrace &&\\
+% WhileStatement
+&\textbf{WhileStatement}  &&\Coloneqq  \textbf{while}(\text{Exp})\lbrace \text{Block}\rbrace &&\\
+% ReturnStatement
+&\textbf{ReturnStatement} &&\Coloneqq  \textbf{return} [\text{Exp}] &&\\
 % Exp
-\textbf{Exp}
-  \;&::=\; \text{LogicAnd} \;\{\; \textbf{||}\;\text{LogicAnd} \;\} \\[3pt]
+&\textbf{Exp}             &&\Coloneqq  \text{LogicAnd}\;\lbrace\text{||}\;\text{LogicAnd}\rbrace &&\\
 % LogicAnd
-\textbf{LogicAnd}
-  \;&::=\; \text{Equality} \;\{\; \textbf{\&\&}\;\text{Equality} \;\} \\[3pt]
+&\textbf{LogicAnd}        &&\Coloneqq  \text{Equality}\;\lbrace\text{&&}\;\text{Equality}\rbrace &&\\
 % Equality
-\textbf{Equality}
-  \;&::=\; \text{Comparison} \; \{ \; ( \; \textbf{==}\;\mid\;\textbf{!=}\;)\;\text{Comparison} \; \}   \\[3pt]
+&\textbf{Equality}        &&\Coloneqq  \text{Comparison}\;\lbrace(\text{==}\mid\text{!=})\;\text{Comparison}\rbrace &&\\
 % Comparison
-\textbf{Comparison}
-  \;&::=\; \text{Term}\; \{\;(\textbf{<}\;\mid\;\textbf{<=}\;\mid\;\textbf{>}\;\mid\;\textbf{>=})\;\text{Term} \;\}\\[3pt]
+&\textbf{Comparison}      &&\Coloneqq  \text{Term}\;\lbrace(<\mid\le\mid>\mid\ge)\;\text{Term}\rbrace &&\\
 % Term
-\textbf{Term}
-  \;&::=\; \text{Factor}\;\{ \;(\textbf{+}\;\mid\;\textbf{-})\;\text{Factor}\; \} \\[3pt]
+&\textbf{Term}            &&\Coloneqq  \text{Factor}\;\lbrace(+\mid-)\;\text{Factor}\rbrace &&\\
 % Factor
-\textbf{Factor}
-  \;&::=\; \text{Unary}\;\{ \;(\textbf{*}\;\mid\;\textbf{/})\;\text{Unary}\; \} \\[3pt]
+&\textbf{Factor}          &&\Coloneqq  \text{Unary}\;\lbrace(*\mid/)\;\text{Unary}\rbrace &&\\
 % Unary
-\textbf{Unary}
-  \;&::=\; (\;\textbf{!}\;\mid\;\textbf{-}\;)\;\text{Unary}
-   \;|\;\text{Primary} \\[3pt]
+&\textbf{Unary}           &&\Coloneqq  (!\mid-)\;\text{Unary} \mid \text{Primary} &&\\
 % Primary
-\textbf{Primary}
-  \;&::=\; \text{IntegerLiteral}\;( \text{INT\_LITERAL} ) \\[2pt]
-  \;&\mid\; ( \textbf{true}\;\mid\;\textbf{false} ) \\[2pt]
-  \;&\mid\; \textbf{this} \\[2pt]
-  \;&\mid\; \text{Identifier} \\[2pt]
-  \;&\mid\; \textbf{(}\,\text{Exp}\,\textbf{)} \\[2pt]
-  \;&\mid\; \text{Primary}\;\textbf{.}\;\text{Identifier} \\[2pt]
-  \;&\mid\; \text{Identifier}\;\textbf{(} \; [\;\text{ArgumentList}\;]\; \textbf{)} \\[3pt]
-% ArgumentList
-\textbf{ArgumentList}
-  \;&::=\; \text{Exp}\; \{ \;\textbf{,}\;\text{Exp} \; \} \\[3pt]
+&\textbf{Primary}         &&\Coloneqq  \text{IntegerLiteral} &&\\
+&                       &&\quad\mid  \text{BooleanLiteral} &&\\
+&                       &&\quad\mid  \text{Identifier} &&\\
+&                       &&\quad\mid  \text{Identifier}(\text{Arguments}) &&\\
+&                       &&\quad\mid  \text{Primary}.\text{Identifier} &&\\
+&                       &&\quad\mid  (\text{Exp}) &&\\
+% BooleanLiteral
+&\textbf{BooleanLiteral}  &&\Coloneqq  \textbf{true}\mid\textbf{false} &&\\
+% Arguments
+&\textbf{Arguments}       &&\Coloneqq  [\text{Exp}\;\lbrace,\;\text{Exp}\rbrace] &&\\
 % END
-\textbf{END}
-  \;&::=\; \textbf{;}\;|\;\textbf{ENDL} \\[3pt]
-% Identifier
-\textbf{Identifier}
-  \;&::=\; \text{ID} \\[3pt]
+&\textbf{END}              &&\Coloneqq  \textbf{;}\mid\textbf{ENDL} &&
 \end{alignat*}
 
 \end{document}
