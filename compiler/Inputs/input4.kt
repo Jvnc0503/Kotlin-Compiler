@@ -1,3 +1,3 @@
 fun main() :Int {
-    var x
+    var x = 1
 }

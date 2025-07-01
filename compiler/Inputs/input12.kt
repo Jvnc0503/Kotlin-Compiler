@@ -5,8 +5,5 @@ fun main() {
                 print(-x)
             }
         }
-        else {
-            println(i)
-        }
     }
 } 

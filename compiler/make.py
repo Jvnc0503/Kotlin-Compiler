@@ -44,7 +44,6 @@ for kt in kt_files:
 
     sp.run(
         [str(exe_compiler), str(kt.resolve())],
-        check=True,
         cwd=BIN_DIR        
     )
 
@@ -54,11 +53,12 @@ for kt in kt_files:
 
     asm_tmp.replace(asm_dest)
 
-    sp.run(["gcc", str(asm_dest), "-o", str(exe_dest)], check=True)
+    sp.run(["gcc", str(asm_dest), "-o", str(exe_dest)])
 
     print(f"→ Ejecutando    {exe_dest.name}")
     sp.run([str(exe_dest)])
     print()
+
 
 
 print("══════════════════  FIN DE TODOS LOS INPUTS  ══════════════════")

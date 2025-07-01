@@ -6,13 +6,11 @@ StmtList* Parser::parseStatementList() {
     Stm* aux = nullptr;
     while ((aux = parseStatement())) {
         sl->add(aux);
-        if (!(match(Token::ENDL) || match(Token::SEMICOLON))) {
-            errorHandler("ENDL | SEMICOLON", "Statement");
-        }
         consumeSeparator();
     }
     return sl;
 }
+
 
 Block* Parser::parseBlock() {
     consumeSeparator();
@@ -91,6 +89,7 @@ IfStatement* Parser::handleIfStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "IF");
     }
+    consumeSeparator();
     if (match(Token::ELSE)) {
         consumeSeparator();
         if (!match(Token::LBRACE)) {
