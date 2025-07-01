@@ -24,16 +24,16 @@ int main(const int argc, const char* argv[]) {
     infile.close();
 
     Scanner scanner(input);
-    scanner.test();
-    scanner.reset();
+    // scanner.test();
+    // scanner.reset();
     Parser parser(&scanner);
     cout << "\nStarting parsing:\n";
     try {
         Program* program = parser.parseProgram();
         cout << "Parsing successful\n\n";
-        PrintVisitor print_visitor;
-        cout << "Starting PrintVisitor:\n\n";
-        print_visitor.imprimir(program);
+        // PrintVisitor print_visitor;
+        // cout << "Starting PrintVisitor:\n\n";
+        // print_visitor.imprimir(program);
 
         ofstream outfile("output.s");
         if (!outfile.is_open()) {

@@ -1,9 +1,7 @@
-fun main() :Int {
-    var x: Int = 2
-    var y: Int = 4
-    if (x > y ) {
-        print(x + y)
-    } else {
-        print(x - y)
+fun main() {
+    var x: Boolean = true
+    var y: Int = 1
+    if (x) {
+        println(y);
     }
 }

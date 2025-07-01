@@ -91,7 +91,8 @@ IfStatement* Parser::handleIfStatement() {
     if (!match(Token::RBRACE)) {
         errorHandler("RBRACE", "IF");
     }
-    consumeSeparator();
+    // consumeSeparator();
+    std::cout << current->text << std::endl;
     if (match(Token::ELSE)) {
         if (!match(Token::LBRACE)) {
             errorHandler("LBRACE", "IF");
