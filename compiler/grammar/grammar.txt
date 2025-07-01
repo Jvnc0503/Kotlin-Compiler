@@ -20,7 +20,7 @@ Type            ::= "Int" | "Boolean" | "Unit"
 
 Block           ::= VarDecList StmtList
 
-StmtList        ::= { Statement END { ENDL } }
+StmtList        ::= { Statement { ENDL } }
 
 Statement       ::= IfStatement
                 | PrintStatement
@@ -32,17 +32,17 @@ Statement       ::= IfStatement
 
 IfStatement     ::= "if" "(" Exp ")" "{" Block "}" [ "else" "{" Block "}" ]
 
-PrintStatement  ::= ( "print" | "println" ) "(" Exp ")"
+PrintStatement  ::= ( "print" | "println" ) "(" Exp ")" END
 
-FCallStm        ::= Identifier "(" [ Exp { "," Exp } ] ")"
+FCallStm        ::= Identifier "(" [ Exp { "," Exp } ] ")" END
 
-AssignStatement ::= Identifier "=" Exp
+AssignStatement ::= Identifier "=" Exp END
 
 ForStatement    ::= "for" "(" Identifier "in" Exp ".." Exp ")" "{" Block "}"
 
 WhileStatement  ::= "while" "(" Exp ")" "{" Block "}"
 
-ReturnStatement ::= "return" [ Exp ]
+ReturnStatement ::= "return" [ Exp ] END
 
 Exp             ::= LogicAnd { "||" LogicAnd }
 

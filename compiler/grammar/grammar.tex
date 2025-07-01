@@ -36,7 +36,7 @@
 % Block
 &\textbf{Block}        &&\Coloneqq  \text{VarDecList}\;\text{StmtList} &&\\
 % StmtList
-&\textbf{StmtList}     &&\Coloneqq  \lbrace\text{Statement}\;\text{END}\;\lbrace \text{ENDL}\rbrace\rbrace &&\\
+&\textbf{StmtList}     &&\Coloneqq  \lbrace\text{Statement}\;\lbrace \text{ENDL}\rbrace\rbrace &&\\
 % Statement
 &\textbf{Statement}    &&\Coloneqq  \text{IfStatement} &&\\
 &                       &&\quad\mid  \text{PrintStatement} &&\\
@@ -48,17 +48,17 @@
 % IfStatement
 &\textbf{IfStatement}     &&\Coloneqq  \textbf{if}(\text{Exp})\lbrace \text{Block}\rbrace [\textbf{else}\lbrace \text{Block}\rbrace] &&\\
 % PrintStatement
-&\textbf{PrintStatement}  &&\Coloneqq  (\textbf{print}\mid\textbf{println})(\text{Exp}) &&\\
+&\textbf{PrintStatement}  &&\Coloneqq  (\textbf{print}\mid\textbf{println})(\text{Exp})\;\text{END} &&\\
 % FCallStm
-&\textbf{FCallStm}        &&\Coloneqq  \text{Identifier}([\text{Exp}\;\lbrace,\;\text{Exp}\rbrace]) &&\\
+&\textbf{FCallStm}        &&\Coloneqq  \text{Identifier}([\text{Exp}\;\lbrace,\;\text{Exp}\rbrace])\;\text{END} &&\\
 % AssignStatement
-&\textbf{AssignStatement} &&\Coloneqq  \text{Identifier} = \text{Exp} &&\\
+&\textbf{AssignStatement} &&\Coloneqq  \text{Identifier} = \text{Exp}\;\text{END} &&\\
 % ForStatement
 &\textbf{ForStatement}    &&\Coloneqq  \textbf{for}(\text{Identifier}\;\textbf{in}\;\text{Exp}..\text{Exp})\lbrace \text{Block}\rbrace &&\\
 % WhileStatement
 &\textbf{WhileStatement}  &&\Coloneqq  \textbf{while}(\text{Exp})\lbrace \text{Block}\rbrace &&\\
 % ReturnStatement
-&\textbf{ReturnStatement} &&\Coloneqq  \textbf{return} [\text{Exp}] &&\\
+&\textbf{ReturnStatement} &&\Coloneqq  \textbf{return} [\text{Exp}]\;\text{END} &&\\
 % Exp
 &\textbf{Exp}             &&\Coloneqq  \text{LogicAnd}\;\lbrace\text{||}\;\text{LogicAnd}\rbrace &&\\
 % LogicAnd
